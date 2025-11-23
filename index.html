@@ -1,0 +1,1838 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Survivors of the Absurd</title>
+
+  <!-- TailwindCSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+    }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+      touch-action: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-white">
+  <div id="game-root" class="relative w-screen h-screen overflow-hidden">
+    <!-- GAME CANVAS -->
+    <canvas id="game" class="w-full h-full"></canvas>
+
+    <!-- HUD TOP -->
+    <div class="absolute top-0 inset-x-0 p-3 flex items-start justify-between pointer-events-none text-xs">
+      <!-- HP / EXP / TIME / GOLD -->
+      <div class="flex flex-col gap-2 pointer-events-auto">
+        <!-- HP -->
+        <div class="flex items-center gap-2">
+          <span class="text-slate-200 text-[11px]">HP</span>
+          <div class="w-32 h-3 bg-slate-900/80 rounded-full overflow-hidden border border-slate-700/80">
+            <div id="hp-bar"
+                 class="h-full bg-gradient-to-r from-emerald-400 via-yellow-400 to-red-500"
+                 style="width:100%;"></div>
+          </div>
+        </div>
+        <!-- EXP -->
+        <div class="flex items-center gap-2">
+          <span class="text-slate-200 text-[11px]">
+            LV <span id="level-label" class="text-cyan-300 font-semibold">1</span>
+          </span>
+          <div class="w-40 h-2.5 bg-slate-900/80 rounded-full overflow-hidden border border-indigo-600/80">
+            <div id="xp-bar"
+                 class="h-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-cyan-300"
+                 style="width:0%;"></div>
+          </div>
+        </div>
+        <!-- Stats -->
+        <div class="flex flex-wrap gap-2 text-[11px] text-slate-300">
+          <span>⏱ <span id="time-label" class="text-cyan-300 font-semibold">0.0</span>s</span>
+          <span>☠ ฆ่าแล้ว <span id="kills-label" class="text-emerald-300 font-semibold">0</span></span>
+          <span>💰 รอบนี้ <span id="gold-run-label" class="text-yellow-300 font-semibold">0</span></span>
+        </div>
+      </div>
+
+      <!-- MINI MAP + DESTINY EVENT BANNER -->
+      <div class="pointer-events-auto flex flex-col items-end gap-2">
+        <div class="bg-slate-900/80 border border-slate-700 rounded-xl p-2 w-28">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[11px] text-slate-300">Mini-map</span>
+            <span class="text-[9px] text-slate-500">Proto</span>
+          </div>
+          <div class="relative w-full aspect-square bg-slate-800/80 rounded-md overflow-hidden" id="minimap">
+          </div>
+        </div>
+        <div id="destiny-banner"
+             class="px-3 py-1 rounded-full bg-sky-500/10 border border-sky-400/40 text-[10px] text-sky-100 hidden">
+          ดวงชะตาฟ้าลิขิต: -
+        </div>
+      </div>
+    </div>
+
+    <!-- HUD BOTTOM: WEAPON / PASSIVE BAR -->
+    <div class="absolute bottom-0 inset-x-0 pb-2 px-3 pointer-events-none text-[10px]">
+      <div class="max-w-3xl mx-auto bg-slate-900/90 border border-slate-700/60 rounded-2xl px-3 py-2 flex flex-col gap-1">
+        <div class="flex items-center justify-between text-slate-300">
+          <span>อาวุธ & สกิล</span>
+          <span class="text-[9px] text-slate-500">สูงสุด 6 ช่อง</span>
+        </div>
+        <div id="skill-bar" class="grid grid-cols-3 sm:grid-cols-6 gap-1">
+          <!-- ช่องสกิลสร้างด้วย JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- BOSS HP -->
+    <div id="boss-hp-container"
+         class="absolute top-12 inset-x-0 flex justify-center pointer-events-none hidden">
+      <div class="bg-slate-900/90 border border-fuchsia-500/70 rounded-full px-3 py-1 shadow-lg backdrop-blur">
+        <div id="boss-name" class="text-[11px] text-fuchsia-200 text-center mb-1">Boss HP</div>
+        <div class="w-60 h-2.5 bg-slate-800/80 rounded-full overflow-hidden border border-fuchsia-500/70">
+          <div id="boss-hp-bar"
+               class="h-full bg-gradient-to-r from-red-500 via-fuchsia-400 to-purple-500"
+               style="width:100%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOBILE JOYSTICK -->
+    <div id="joystick"
+         class="absolute bottom-4 left-4 w-24 h-24 rounded-full bg-slate-900/40 border border-slate-600/80 flex items-center justify-center select-none sm:opacity-80">
+      <div id="joystick-knob" class="w-10 h-10 rounded-full bg-slate-100/80 shadow-md"></div>
+    </div>
+
+    <!-- MAIN MENU -->
+    <div id="screen-main-menu"
+         class="absolute inset-0 bg-slate-950/90 backdrop-blur flex items-center justify-center z-40">
+      <div class="bg-slate-900/90 border border-slate-700/80 rounded-3xl p-6 max-w-xl w-[92%] shadow-2xl">
+        <h1 class="text-2xl font-semibold text-center mb-2">Survivors of the Absurd</h1>
+        <p class="text-xs text-slate-300 text-center mb-4 leading-relaxed">
+          เอาชีวิตรอดจากฝูงมอนสเตอร์สุดเพี้ยน เก็บ EXP & ทอง<br>
+          ซื้อ Power-ups ถาวรเพื่อให้รอบต่อไปโหดขึ้นเรื่อย ๆ
+        </p>
+
+        <div class="flex items-center justify-center mb-3 text-[11px] text-yellow-300 gap-1">
+          💰 ทองถาวร: <span id="meta-gold" class="font-semibold">0</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 text-sm mb-4">
+          <button id="btn-main-start"
+                  class="col-span-2 py-2 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-semibold transition">
+            ▶ เริ่มเกม
+          </button>
+          <button
+            class="py-2 rounded-2xl bg-slate-800/90 border border-slate-600 text-slate-100 hover:border-cyan-400 transition cursor-default">
+            ตัวละคร
+          </button>
+          <button id="btn-main-powerups"
+            class="py-2 rounded-2xl bg-slate-800/90 border border-slate-600 text-slate-100 hover:border-emerald-400 transition">
+            Power-ups
+          </button>
+          <button
+            class="py-2 rounded-2xl bg-slate-800/90 border border-slate-600 text-slate-100 hover:border-slate-500 transition cursor-default">
+            Collection
+          </button>
+          <button
+            class="py-2 rounded-2xl bg-slate-800/90 border border-slate-600 text-slate-100 hover:border-slate-500 transition cursor-default">
+            Secrets
+          </button>
+        </div>
+        <p class="text-[11px] text-slate-400 text-center">
+          คอม: W A S D / ลูกศร เพื่อเดิน • มือถือ: ใช้จอยวงกลมด้านล่างซ้าย
+        </p>
+      </div>
+    </div>
+
+    <!-- POWER-UPS MENU -->
+    <div id="screen-powerups"
+         class="absolute inset-0 bg-slate-950/80 backdrop-blur flex items-center justify-center z-50 hidden">
+      <div class="bg-slate-900/95 border border-emerald-500/60 rounded-3xl p-5 max-w-xl w-[96%] shadow-2xl text-xs">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-lg font-semibold">อัปเกรดถาวร (Power-ups)</h2>
+          <button id="btn-close-powerups"
+                  class="text-[11px] px-2 py-1 rounded-full bg-slate-800 hover:bg-slate-700">
+            ปิด
+          </button>
+        </div>
+        <div class="mb-3 text-[11px] text-slate-300 flex items-center gap-2">
+          💰 ทองถาวร: <span id="meta-gold-2" class="font-semibold text-yellow-300">0</span>
+          <span class="text-slate-500">* ทองได้จากการเล่นแต่ละรอบ</span>
+        </div>
+        <div id="powerup-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <!-- เติมด้วย JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- CHARACTER & STAGE SELECT -->
+    <div id="screen-char-stage"
+         class="absolute inset-0 bg-slate-950/90 backdrop-blur flex items-center justify-center z-30 hidden">
+      <div class="bg-slate-900/95 border border-slate-700 rounded-3xl p-5 max-w-4xl w-[96%] shadow-2xl text-xs">
+        <h2 class="text-lg font-semibold text-center mb-2">เลือกตัวละคร & ด่าน</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Characters -->
+          <div>
+            <h3 class="text-[11px] text-slate-300 mb-2">ตัวละคร (Characters)</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" id="character-list">
+              <!-- เติมด้วย JS -->
+            </div>
+          </div>
+
+          <!-- Stages -->
+          <div>
+            <h3 class="text-[11px] text-slate-300 mb-2">ด่าน (Stages)</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" id="stage-list">
+              <!-- เติมด้วย JS -->
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 flex flex-col sm:flex-row gap-2 justify-between items-center">
+          <div class="text-[11px] text-slate-400">
+            เลือกตัวละครและด่านให้ครบก่อน แล้วกดเริ่มเกม
+          </div>
+          <button id="btn-start-run"
+                  class="px-4 py-2 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-semibold text-xs disabled:opacity-40 disabled:cursor-not-allowed">
+            เริ่มด่าน!
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEVEL UP -->
+    <div id="screen-levelup"
+         class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-30 hidden">
+      <div class="bg-slate-900/95 border border-slate-700 rounded-3xl p-5 max-w-3xl w-[96%] shadow-2xl text-xs">
+        <h2 class="text-lg font-semibold text-center mb-2">เลเวลอัป! เลือกสกิล / สเตตัส</h2>
+        <p class="text-[11px] text-slate-300 text-center mb-3">
+          เลือก 1 อย่างจากตัวเลือกด้านล่าง
+        </p>
+        <div id="levelup-options" class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <!-- เติมด้วย JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- GAME OVER -->
+    <div id="screen-gameover"
+         class="absolute inset-0 bg-slate-950/85 backdrop-blur flex items-center justify-center z-40 hidden">
+      <div class="bg-slate-900/95 border border-slate-700 rounded-3xl p-6 max-w-sm w-[92%] text-center shadow-2xl text-xs">
+        <h2 class="text-xl font-semibold mb-2 text-white">Game Over</h2>
+        <p class="text-slate-300 mb-2">
+          คุณรอดชีวิตไป <span id="go-time" class="text-cyan-300 font-semibold">0.0</span> วินาที<br>
+          กำจัดศัตรูได้ <span id="go-kills" class="text-emerald-300 font-semibold">0</span> ตัว<br>
+          เลเวลที่ไปถึง <span id="go-level" class="text-indigo-300 font-semibold">1</span><br>
+          ได้ทองรอบนี้ <span id="go-gold" class="text-yellow-300 font-semibold">0</span>
+        </p>
+        <button id="btn-restart"
+                class="mt-3 w-full py-2.5 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-semibold text-sm transition">
+          กลับสู่เมนูหลัก
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // === DOM =========================================================
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+
+    const hpBar = document.getElementById('hp-bar');
+    const xpBar = document.getElementById('xp-bar');
+    const levelLabel = document.getElementById('level-label');
+    const timeLabel = document.getElementById('time-label');
+    const killsLabel = document.getElementById('kills-label');
+    const goldRunLabel = document.getElementById('gold-run-label');
+
+    const bossHpContainer = document.getElementById('boss-hp-container');
+    const bossHpBar = document.getElementById('boss-hp-bar');
+    const bossNameLabel = document.getElementById('boss-name');
+
+    const joystick = document.getElementById('joystick');
+    const joystickKnob = document.getElementById('joystick-knob');
+
+    const screenMainMenu = document.getElementById('screen-main-menu');
+    const screenCharStage = document.getElementById('screen-char-stage');
+    const screenLevelup = document.getElementById('screen-levelup');
+    const screenGameover = document.getElementById('screen-gameover');
+    const screenPowerups = document.getElementById('screen-powerups');
+
+    const btnMainStart = document.getElementById('btn-main-start');
+    const btnMainPowerups = document.getElementById('btn-main-powerups');
+    const btnStartRun = document.getElementById('btn-start-run');
+    const btnRestart = document.getElementById('btn-restart');
+    const btnClosePowerups = document.getElementById('btn-close-powerups');
+
+    const characterListEl = document.getElementById('character-list');
+    const stageListEl = document.getElementById('stage-list');
+    const levelupOptionsEl = document.getElementById('levelup-options');
+    const skillBarEl = document.getElementById('skill-bar');
+    const minimapEl = document.getElementById('minimap');
+    const destinyBanner = document.getElementById('destiny-banner');
+
+    const goTime = document.getElementById('go-time');
+    const goKills = document.getElementById('go-kills');
+    const goLevel = document.getElementById('go-level');
+    const goGold = document.getElementById('go-gold');
+
+    const metaGoldLabel = document.getElementById('meta-gold');
+    const metaGoldLabel2 = document.getElementById('meta-gold-2');
+    const powerupListEl = document.getElementById('powerup-list');
+
+    // === META (LOCALSTORAGE) =========================================
+    const META_KEY = 'soa_meta_v1';
+    function loadMeta() {
+      try {
+        const raw = localStorage.getItem(META_KEY);
+        if (!raw) return { gold: 0, powerups: {} };
+        const obj = JSON.parse(raw);
+        if (!obj.powerups) obj.powerups = {};
+        if (typeof obj.gold !== 'number') obj.gold = 0;
+        return obj;
+      } catch (e) {
+        return { gold: 0, powerups: {} };
+      }
+    }
+    function saveMeta() {
+      localStorage.setItem(META_KEY, JSON.stringify(meta));
+      metaGoldLabel.textContent = meta.gold.toString();
+      metaGoldLabel2.textContent = meta.gold.toString();
+    }
+    const meta = loadMeta();
+
+    // === GAME DEFINITIONS ============================================
+    const CHARACTERS = {
+      pong: {
+        id: 'pong',
+        name: 'ลุงป๋องเก็บขยะพลังวิเศษ',
+        desc: 'ไม้เก็บของวิญญาณ | Passive: ขุมทรัพย์จากกองขยะ',
+        color: 'border-emerald-400/60 hover:border-emerald-300',
+        hp: 130,
+        speed: 210,
+        baseDamage: 1.4,
+        weaponType: 'stick',
+        passive: 'trashTreasure'
+      },
+      ning: {
+        id: 'ning',
+        name: 'เจ๊หนิงขายไก่ทอดลอยฟ้า',
+        desc: 'น่องไก่ยักษ์ระเบิด | Passive: สูตรลับความกรอบ',
+        color: 'border-amber-400/60 hover:border-amber-300',
+        hp: 110,
+        speed: 225,
+        baseDamage: 1.5,
+        weaponType: 'chicken',
+        passive: 'crispyBuff'
+      },
+      cat: {
+        id: 'cat',
+        name: 'น้องแมวส้มเมี้ยวบ้าพลัง',
+        desc: 'ก้อนขนฟูฟ่อง | Passive: พลังงานแห่งความง่วง',
+        color: 'border-fuchsia-400/60 hover:border-fuchsia-300',
+        hp: 120,
+        speed: 230,
+        baseDamage: 1.3,
+        weaponType: 'fluff',
+        passive: 'sleepBuff'
+      }
+    };
+
+    const STAGES = {
+      garbage: {
+        id: 'garbage',
+        name: 'ทุ่งขยะสุดสยอง',
+        desc: 'ด่านเริ่มต้น มีขยะเต็มพื้น',
+        theme: 'garbage'
+      },
+      market: {
+        id: 'market',
+        name: 'ตลาดสดพลังเพี้ยน',
+        desc: 'มีกับดักเขียงหมู ผักผลไม้เคลื่อนที่ได้',
+        theme: 'market'
+      },
+      classroom: {
+        id: 'classroom',
+        name: 'ห้องเรียนโกลาหล',
+        desc: 'โต๊ะเก้าอี้ขวางทาง บอสคืออาจารย์ใหญ่คณิต',
+        theme: 'classroom'
+      }
+    };
+
+    const SKILLS = [
+      {
+        id: 'multi',
+        type: 'weapon',
+        name: 'ยิงหลายทิศ',
+        maxLevel: 5,
+        descLv: [
+          'เพิ่มกระสุน +1 ทิศ',
+          'กระสุนเพิ่ม +2 ทิศ',
+          'เพิ่มความแรงเล็กน้อย',
+          'กระจายมุมกว้างขึ้น',
+          'ยิงพรุ่งแบบสุดโหด'
+        ]
+      },
+      {
+        id: 'blade',
+        type: 'weapon',
+        name: 'ดาบหมุนรอบตัว',
+        maxLevel: 4,
+        descLv: [
+          'วงดาบหมุนรอบตัว',
+          'เพิ่มรัศมีและดาเมจ',
+          'หมุนเร็วขึ้น',
+          'วงดาบหนาแน่นรอบตัว'
+        ]
+      },
+      {
+        id: 'boots',
+        type: 'passive',
+        name: 'รองเท้าบูท 7 ลี้',
+        maxLevel: 4,
+        descLv: [
+          'เพิ่มความเร็ววิ่ง',
+          'ชนศัตรูทำดาเมจนิดหน่อย',
+          'ลดดาเมจที่ได้รับเล็กน้อย',
+          'เร็วจัด ใกล้วิ่งทะลุมิติ'
+        ]
+      },
+      {
+        id: 'pepper',
+        type: 'weapon',
+        name: 'หนังสติ๊กพริกไทย',
+        maxLevel: 4,
+        descLv: [
+          'กระสุนมีโอกาสสโลว์',
+          'สโลว์นานขึ้น',
+          'สโลว์แรงขึ้น',
+          'สโลว์เป็นวงเล็ก ๆ'
+        ]
+      },
+      {
+        id: 'fan',
+        type: 'weapon',
+        name: 'พัดลมไอเย็น',
+        maxLevel: 3,
+        descLv: [
+          'วงลมเย็นสโลว์รอบตัว',
+          'รัศมีกว้างขึ้น',
+          'ทำดาเมจต่อเนื่องเบา ๆ'
+        ]
+      },
+      {
+        id: 'burst',
+        type: 'weapon',
+        name: 'พุ่งกระสุนรอบตัว',
+        maxLevel: 3,
+        descLv: [
+          'ยิงกระสุน 8 ทิศเป็นช่วง ๆ',
+          'เพิ่มความถี่ในการพุ่ง',
+          'สองชั้นต่อเนื่อง'
+        ]
+      },
+      // Stats
+      {
+        id: 'might',
+        type: 'stat',
+        name: 'Might (พลังโจมตี)',
+        maxLevel: 5,
+        descLv: [
+          'เพิ่มดาเมจทั้งหมดเล็กน้อย',
+          'เพิ่มดาเมจอีกเล็กน้อย',
+          'ดาเมจเริ่มโหดขึ้น',
+          'ดาเมจแรงมาก',
+          'พลังทำลายล้างสุดขีด'
+        ]
+      },
+      {
+        id: 'area',
+        type: 'stat',
+        name: 'Area (พื้นที่โจมตี)',
+        maxLevel: 5,
+        descLv: [
+          'เพิ่มขนาดเอฟเฟกต์อาวุธ',
+          'พื้นที่ใหญ่ขึ้นอีก',
+          'วงดาบ/ลมเย็นกว้างขึ้น',
+          'แทบทั้งจอกลายเป็นเขตอันตราย',
+          'Area ระดับบ้าเลือด'
+        ]
+      },
+      {
+        id: 'cooldown',
+        type: 'stat',
+        name: 'Cooldown (คูลดาวน์)',
+        maxLevel: 5,
+        descLv: [
+          'ลดคูลดาวน์เล็กน้อย',
+          'ยิงถี่ขึ้น',
+          'ยิงแทบไม่พัก',
+          'อาวุธแทบยิงรัวตลอดเวลา',
+          'Cooldown แทบหายไป'
+        ]
+      },
+      {
+        id: 'luck',
+        type: 'stat',
+        name: 'Luck (โชคดี)',
+        maxLevel: 5,
+        descLv: [
+          'มีโอกาสได้สกิลดีมากขึ้น',
+          'ดรอปของดีบ่อยขึ้น',
+          'เหตุการณ์ดวงดีถี่ขึ้น',
+          'โชคโคตรดี',
+          'โชคแตกสุด ๆ'
+        ]
+      },
+      {
+        id: 'curse',
+        type: 'stat',
+        name: 'Curse (คำสาป)',
+        maxLevel: 5,
+        descLv: [
+          'เพิ่มจำนวน/ความเร็วมอนเล็กน้อย (แลก EXP)',
+          'มอนเยอะขึ้นอีก',
+          'ท่วมจอ แต่ฟาร์มสุดมัน',
+          'มอนเยอะจนจอแทบแตก',
+          'โหมดนรกของจริง'
+        ]
+      }
+    ];
+
+    const POWER_UP_DEFS = [
+      {
+        id: 'hpUp',
+        name: 'เพิ่ม HP เริ่มต้น',
+        desc: 'เพิ่ม HP เริ่มต้น +10 ต่อเลเวล',
+        maxLevel: 5,
+        baseCost: 50
+      },
+      {
+        id: 'speedUp',
+        name: 'เพิ่มความเร็วเริ่มต้น',
+        desc: 'เพิ่มความเร็ววิ่งเริ่มต้นเล็กน้อย',
+        maxLevel: 5,
+        baseCost: 50
+      },
+      {
+        id: 'mightUp',
+        name: 'เพิ่ม Might เริ่มต้น',
+        desc: 'เริ่มต้นด้วยพลังโจมตีที่สูงขึ้น',
+        maxLevel: 3,
+        baseCost: 80
+      },
+      {
+        id: 'luckUp',
+        name: 'เพิ่ม Luck เริ่มต้น',
+        desc: 'ดวงดีตั้งแต่ต้นเกม',
+        maxLevel: 3,
+        baseCost: 80
+      }
+    ];
+    // === SPRITES ========================================================
+  const SPRITE_SOURCES = {
+    player: {
+      pong: 'assets/characters/pong.png',
+      ning: 'assets/characters/ning.png',
+      cat:  'assets/characters/cat.png'
+    },
+    stage: {
+      garbage:   'assets/stages/garbage.png',
+      market:    'assets/stages/market.png',
+      classroom: 'assets/stages/classroom.png'
+    },
+    monster: {
+      slime:    'assets/monsters/slime.png',
+      roach:    'assets/monsters/roach.png',
+      chicken:  'assets/monsters/chicken.png',
+      duck:     'assets/monsters/duck.png',
+      ghost:    'assets/monsters/ghost.png',
+      mathBoss: 'assets/monsters/mathBoss.png'
+    }
+  };
+
+  const SPRITES = {
+    player: {},
+    stage: {},
+    monster: {}
+  };
+
+  // โหลดรูปทั้งหมด
+  function loadAllSprites() {
+    for (const key in SPRITE_SOURCES.player) {
+      const img = new Image();
+      img.src = SPRITE_SOURCES.player[key];
+      SPRITES.player[key] = img;
+    }
+    for (const key in SPRITE_SOURCES.stage) {
+      const img = new Image();
+      img.src = SPRITE_SOURCES.stage[key];
+      SPRITES.stage[key] = img;
+    }
+    for (const key in SPRITE_SOURCES.monster) {
+      const img = new Image();
+      img.src = SPRITE_SOURCES.monster[key];
+      SPRITES.monster[key] = img;
+    }
+  }
+
+  // === SOUND EFFECTS ==========================================
+  const SFX = {};
+
+  function loadSounds() {
+    // เสียงเลเวลอัป
+    const levelUp = new Audio('assets/sfx/levelup.mp3');
+    levelUp.volume = 0.7; // ปรับความดัง 0.0 - 1.0
+    SFX.levelup = levelUp;
+  }
+
+  function playSfx(name) {
+    const s = SFX[name];
+    if (!s) return;
+    // รีเซ็ตให้เล่นใหม่ตั้งแต่ต้น
+    try {
+      s.currentTime = 0;
+      s.play().catch(() => {});
+    } catch (e) {}
+  }
+
+
+
+    
+
+    // === STATE =======================================================
+    const state = {
+      running: false,
+      inLevelUp: false,
+
+      characterId: null,
+      stageId: null,
+
+      player: {
+        x: 0,
+        y: 0,
+        radius: 14,
+        speed: 220,
+        maxHp: 120,
+        hp: 120,
+        level: 1,
+        xp: 0,
+        xpToNext: 5
+      },
+
+      baseDamage: 1.2,
+      weaponType: 'stick',
+
+      enemies: [],
+      bullets: [],
+      items: [],
+      skills: {}, // skillId -> level
+      stats: { might: 1, area: 1, cooldown: 1, luck: 1, curse: 1 },
+
+      spinBladeAngle: 0,
+
+      time: 0,
+      kills: 0,
+      goldRun: 0,
+      lastTimestamp: 0,
+      spawnTimer: 0,
+      spawnInterval: 1300,
+      shootTimer: 0,
+      burstTimer: 0,
+      bossSpawned: false,
+
+      destinyTimer: 0,
+      destinyActive: null,
+      destinyTimeLeft: 0,
+
+      keys: {},
+      joystick: { x: 0, y: 0, active: false },
+
+      passiveEffects: {
+        trashTreasure: false,
+        crispyBuff: false,
+        sleepBuff: false,
+        sleepStun: 0,
+        sleepBuffTime: 0
+      },
+
+      pepperEvolved: false // ปืนใหญ่แก๊สน้ำตาพริกไทย
+    };
+
+    // === CANVAS RESIZE ===============================================
+    function resizeCanvas() {
+      const root = document.getElementById('game-root');
+      const rect = root.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // === INPUT: KEYBOARD =============================================
+    window.addEventListener('keydown', (e) => {
+      state.keys[e.code] = true;
+    });
+    window.addEventListener('keyup', (e) => {
+      state.keys[e.code] = false;
+    });
+
+    // === INPUT: JOYSTICK =============================================
+    function updateJoystickFromEvent(e) {
+      const rect = joystick.getBoundingClientRect();
+      let clientX, clientY;
+      if (e.touches && e.touches.length > 0) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
+      const cx = rect.width / 2;
+      const cy = rect.height / 2;
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+      let dx = x - cx;
+      let dy = y - cy;
+      const dist = Math.hypot(dx, dy) || 1;
+      const maxDist = rect.width / 2 - 10;
+      if (dist > maxDist) {
+        dx = dx / dist * maxDist;
+        dy = dy / dist * maxDist;
+      }
+      joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+      if (dist > 10) {
+        state.joystick.x = dx / dist;
+        state.joystick.y = dy / dist;
+      } else {
+        state.joystick.x = 0;
+        state.joystick.y = 0;
+      }
+    }
+    function resetJoystick() {
+      state.joystick.x = 0;
+      state.joystick.y = 0;
+      joystickKnob.style.transform = 'translate(0,0)';
+      state.joystick.active = false;
+    }
+
+    joystick.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      state.joystick.active = true;
+      updateJoystickFromEvent(e);
+    }, { passive: false });
+    joystick.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      if (!state.joystick.active) return;
+      updateJoystickFromEvent(e);
+    }, { passive: false });
+    joystick.addEventListener('touchend', (e) => { e.preventDefault(); resetJoystick(); }, { passive: false });
+    joystick.addEventListener('touchcancel', (e) => { e.preventDefault(); resetJoystick(); }, { passive: false });
+
+    joystick.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      state.joystick.active = true;
+      updateJoystickFromEvent(e);
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!state.joystick.active) return;
+      updateJoystickFromEvent(e);
+    });
+    window.addEventListener('mouseup', resetJoystick);
+
+    // === UI: BUILD CHARACTER / STAGE / POWERUPS ======================
+    function buildCharacterCards() {
+      characterListEl.innerHTML = '';
+      for (const id in CHARACTERS) {
+        const c = CHARACTERS[id];
+        const btn = document.createElement('button');
+        btn.className =
+          `char-card text-left rounded-2xl border bg-slate-900/80 px-3 py-2 hover:bg-slate-800/80 transition ${c.color}`;
+        btn.dataset.charId = id;
+        btn.innerHTML = `
+          <div class="text-[10px] text-slate-400 mb-1 uppercase">${id}</div>
+          <div class="text-[13px] font-semibold mb-1">${c.name}</div>
+          <div class="text-[11px] text-slate-300 leading-snug">${c.desc}</div>
+        `;
+        btn.addEventListener('click', () => {
+          state.characterId = id;
+          updateCharStageSelection();
+        });
+        characterListEl.appendChild(btn);
+      }
+    }
+
+    function buildStageCards() {
+      stageListEl.innerHTML = '';
+      Object.values(STAGES).forEach(s => {
+        const btn = document.createElement('button');
+        btn.className =
+          'stage-card text-left rounded-2xl border border-slate-600 bg-slate-900/80 px-3 py-2 hover:bg-slate-800/80 transition';
+        btn.dataset.stageId = s.id;
+        btn.innerHTML = `
+          <div class="text-[10px] text-slate-400 mb-1 uppercase">${s.id}</div>
+          <div class="text-[13px] font-semibold mb-1">${s.name}</div>
+          <div class="text-[11px] text-slate-300 leading-snug">${s.desc}</div>
+        `;
+        btn.addEventListener('click', () => {
+          state.stageId = s.id;
+          updateCharStageSelection();
+        });
+        stageListEl.appendChild(btn);
+      });
+    }
+
+    function updateCharStageSelection() {
+      document.querySelectorAll('.char-card').forEach(btn => {
+        if (btn.dataset.charId === state.characterId) {
+          btn.classList.add('ring-2', 'ring-cyan-400');
+        } else {
+          btn.classList.remove('ring-2', 'ring-cyan-400');
+        }
+      });
+      document.querySelectorAll('.stage-card').forEach(btn => {
+        if (btn.dataset.stageId === state.stageId) {
+          btn.classList.remove('border-slate-600');
+          btn.classList.add('border-cyan-400', 'bg-slate-800/90');
+        } else {
+          btn.classList.add('border-slate-600');
+          btn.classList.remove('border-cyan-400', 'bg-slate-800/90');
+        }
+      });
+
+      btnStartRun.disabled = !(state.characterId && state.stageId);
+    }
+
+    function updateSkillBar() {
+      const ids = Object.keys(state.skills);
+      const maxSlots = 6;
+      let html = '';
+      for (let i = 0; i < maxSlots; i++) {
+        if (i < ids.length) {
+          const id = ids[i];
+          const level = state.skills[id];
+          const def = SKILLS.find(s => s.id === id);
+          html += `
+            <div class="rounded-xl bg-slate-800/90 border border-cyan-500/60 px-2 py-1 flex flex-col">
+              <span class="text-[10px] font-semibold text-cyan-300 truncate">${def ? def.name : id}</span>
+              <span class="text-[10px] text-slate-300">LV ${level}</span>
+            </div>
+          `;
+        } else {
+          html += `
+            <div class="rounded-xl bg-slate-800/40 border border-slate-700/70 px-2 py-1 flex items-center justify-center text-slate-500">
+              -
+            </div>
+          `;
+        }
+      }
+      skillBarEl.innerHTML = html;
+    }
+
+    function buildPowerupCards() {
+      powerupListEl.innerHTML = '';
+      POWER_UP_DEFS.forEach(def => {
+        const level = meta.powerups[def.id] || 0;
+        const nextLevel = level + 1;
+        const cost = Math.round(def.baseCost * (1 + level * 0.8));
+        const maxed = level >= def.maxLevel;
+
+        const card = document.createElement('button');
+        card.className =
+          'text-left rounded-2xl border border-slate-600 bg-slate-900/90 px-3 py-2 hover:bg-slate-800/90 transition disabled:opacity-40 disabled:cursor-not-allowed';
+        card.disabled = maxed || meta.gold < cost;
+        card.innerHTML = `
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[13px] font-semibold text-emerald-300">${def.name}</span>
+            <span class="text-[10px] text-slate-400">LV ${level}/${def.maxLevel}</span>
+          </div>
+          <div class="text-[11px] text-slate-200 mb-1">${def.desc}</div>
+          <div class="text-[11px] text-yellow-300">ค่าใช้จ่าย: ${maxed ? 'เต็มระดับแล้ว' : cost + ' ทอง'}</div>
+        `;
+        card.addEventListener('click', () => {
+          if (maxed) return;
+          if (meta.gold < cost) return;
+          meta.gold -= cost;
+          meta.powerups[def.id] = nextLevel;
+          saveMeta();
+          buildPowerupCards();
+        });
+        powerupListEl.appendChild(card);
+      });
+      metaGoldLabel.textContent = meta.gold.toString();
+      metaGoldLabel2.textContent = meta.gold.toString();
+    }
+
+    // === HP / XP / GOLD UI ===========================================
+    function updateHpUi() {
+      const p = state.player;
+      hpBar.style.width = `${Math.max(0, Math.min(1, p.hp / p.maxHp)) * 100}%`;
+    }
+
+    function updateXpUi() {
+      const p = state.player;
+      xpBar.style.width = `${Math.max(0, Math.min(1, p.xp / p.xpToNext)) * 100}%`;
+      levelLabel.textContent = p.level.toString();
+    }
+
+    function addGold(amount) {
+      state.goldRun += amount;
+      goldRunLabel.textContent = Math.round(state.goldRun).toString();
+    }
+
+    // === ENEMY SPAWN / BOSS ==========================================
+    function spawnEnemy() {
+      const root = document.getElementById('game-root');
+      const rect = root.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+
+      const side = Math.floor(Math.random() * 4);
+      let x, y;
+      if (side === 0) { x = Math.random() * w; y = -20; }
+      else if (side === 1) { x = w + 20; y = Math.random() * h; }
+      else if (side === 2) { x = Math.random() * w; y = h + 20; }
+      else { x = -20; y = Math.random() * h; }
+
+      const t = Math.random();
+      let type = 'slime';
+      let radius = 12;
+      let baseHp = 3 + state.time * 0.08;
+      let speed = 60;
+      let xp = 1;
+      let goldValue = 1;
+
+      const curseFactor = 1 + (state.stats.curse - 1) * 0.5;
+      baseHp *= curseFactor;
+
+      const stage = state.stageId;
+      if (stage === 'garbage') {
+        if (t < 0.4) { type = 'slime'; speed = 55; xp = 1; goldValue = 1; }
+        else if (t < 0.7) { type = 'roach'; radius = 7; baseHp = 1.2; speed = 120; xp = 0.5; goldValue = 3; }
+        else { type = 'chicken'; radius = 13; speed = 130; xp = 2; goldValue = 2; }
+      } else if (stage === 'market') {
+        if (t < 0.3) { type = 'duck'; radius = 16; speed = 80; xp = 2; goldValue = 2; }
+        else if (t < 0.6) { type = 'chicken'; radius = 13; speed = 140; xp = 2; goldValue = 2; }
+        else { type = 'slime'; speed = 70; xp = 1; goldValue = 1; }
+      } else if (stage === 'classroom') {
+        if (t < 0.4) { type = 'ghost'; radius = 16; speed = 40; xp = 2; goldValue = 2; }
+        else if (t < 0.7) { type = 'roach'; radius = 7; speed = 110; xp = 0.5; goldValue = 3; }
+        else { type = 'duck'; radius = 16; speed = 80; xp = 2; goldValue = 2; }
+      }
+
+      state.enemies.push({
+        x, y,
+        radius,
+        speed,
+        hp: baseHp,
+        maxHp: baseHp,
+        type,
+        isBoss: false,
+        slowTimer: 0,
+        goldValue
+      });
+    }
+
+    function spawnBoss() {
+      const root = document.getElementById('game-root');
+      const rect = root.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+
+      let type = 'boss';
+      if (state.stageId === 'classroom') type = 'mathBoss';
+
+      const hpBase = 200 + state.time * 2;
+      const curseFactor = 1 + (state.stats.curse - 1) * 0.7;
+
+      state.enemies.push({
+        x: w / 2,
+        y: -60,
+        radius: 32,
+        speed: 40,
+        hp: hpBase * curseFactor,
+        maxHp: hpBase * curseFactor,
+        type,
+        isBoss: true,
+        projTimer: 0,
+        goldValue: 30
+      });
+      state.bossSpawned = true;
+      updateBossUi();
+    }
+
+    function updateBossUi() {
+      const boss = state.enemies.find(e => e.isBoss);
+      if (!boss) {
+        bossHpContainer.classList.add('hidden');
+        return;
+      }
+      bossHpContainer.classList.remove('hidden');
+      bossNameLabel.textContent =
+        boss.type === 'mathBoss' ? 'อาจารย์ใหญ่คณิตศาสตร์' : 'Boss';
+      const ratio = boss.hp / boss.maxHp;
+      bossHpBar.style.width = `${Math.max(0, Math.min(1, ratio)) * 100}%`;
+    }
+
+    // === SHOOT / SKILLS ==============================================
+    function shootMainWeapon() {
+      if (state.enemies.length === 0) return;
+      const p = state.player;
+
+      // ถ้าแมวกำลังหลับ -> หยุดยิง
+      if (state.passiveEffects.sleepStun > 0) return;
+
+      let target = null;
+      let bestDist = Infinity;
+      state.enemies.forEach(e => {
+        const d = Math.hypot(e.x - p.x, e.y - p.y);
+        if (d < bestDist) { bestDist = d; target = e; }
+      });
+      if (!target) return;
+
+      const dx = target.x - p.x;
+      const dy = target.y - p.y;
+      let angle = Math.atan2(dy, dx);
+      const baseSpeed = 310;
+
+      const bulletsAngles = [];
+      const multiLv = state.skills['multi'] || 0;
+      const countExtra = multiLv;
+      const spread = (10 + multiLv * 6) * Math.PI / 180;
+
+      bulletsAngles.push(angle);
+      for (let i = 1; i <= countExtra; i++) {
+        bulletsAngles.push(angle + spread * i);
+        bulletsAngles.push(angle - spread * i);
+      }
+
+      let dmgBase = state.baseDamage * state.stats.might;
+
+      // เจ๊หนิง: บัฟความกรอบเมื่อ HP < 50%
+      if (state.passiveEffects.crispyBuff && state.player.hp < state.player.maxHp * 0.5) {
+        dmgBase *= 1.3;
+      }
+
+      bulletsAngles.forEach(a => {
+        state.bullets.push({
+          x: p.x,
+          y: p.y,
+          radius: 4,
+          vx: Math.cos(a) * baseSpeed,
+          vy: Math.sin(a) * baseSpeed,
+          damage: dmgBase,
+          type: state.weaponType
+        });
+      });
+    }
+
+    function applySkillLevel(id, level) {
+      if (id === 'boots') {
+        const baseSpeed = CHARACTERS[state.characterId].speed +
+          (meta.powerups.speedUp || 0) * 8;
+        state.player.speed = baseSpeed + level * 15;
+      } else if (id === 'might') {
+        state.stats.might = 1 + level * 0.15 + (meta.powerups.mightUp || 0) * 0.1;
+      } else if (id === 'area') {
+        state.stats.area = 1 + level * 0.12;
+      } else if (id === 'cooldown') {
+        state.stats.cooldown = 1 + level * 0.18;
+      } else if (id === 'luck') {
+        state.stats.luck = 1 + level * 0.2 + (meta.powerups.luckUp || 0) * 0.1;
+      } else if (id === 'curse') {
+        state.stats.curse = 1 + level * 0.25;
+      } else if (id === 'pepper') {
+        if (level >= 4 && !state.pepperEvolved && state.time > 10 * 60) {
+          // ยุคปืนใหญ่แก๊สน้ำตาพริกไทย
+          state.pepperEvolved = true;
+          showDestinyBanner('วิวัฒนาการ: ปืนใหญ่แก๊สน้ำตาพริกไทย!');
+        }
+      }
+    }
+
+    function openLevelUp() {
+      state.inLevelUp = true;
+      screenLevelup.classList.remove('hidden');
+
+      const available = SKILLS.filter(s => (state.skills[s.id] || 0) < s.maxLevel);
+      if (available.length === 0) {
+        state.inLevelUp = false;
+        screenLevelup.classList.add('hidden');
+        return;
+      }
+      const shuffled = [...available].sort(() => Math.random() - 0.5);
+      const luckFactor = state.stats.luck;
+      const count = luckFactor > 1.6 ? 4 : 3;
+      const options = shuffled.slice(0, Math.min(count, shuffled.length));
+
+      levelupOptionsEl.innerHTML = '';
+      options.forEach(def => {
+        const lv = state.skills[def.id] || 0;
+        const nextLv = lv + 1;
+        const desc = def.descLv[Math.min(def.descLv.length - 1, lv)];
+        const btn = document.createElement('button');
+        btn.className =
+          'skill-opt text-left rounded-2xl border border-slate-600 bg-slate-900/80 hover:bg-slate-800/80 hover:border-cyan-400 px-3 py-2 transition';
+        btn.dataset.skillId = def.id;
+        btn.innerHTML = `
+          <div class="text-[10px] text-slate-400 mb-1">LV ${nextLv}/${def.maxLevel}</div>
+          <div class="text-[13px] font-semibold ${def.type === 'stat' ? 'text-emerald-300' : 'text-cyan-300'} mb-1">
+            ${def.name}
+          </div>
+          <div class="text-[11px] text-slate-200">${desc}</div>
+        `;
+        btn.addEventListener('click', () => {
+          state.skills[def.id] = nextLv;
+          applySkillLevel(def.id, nextLv);
+          updateSkillBar();
+          state.inLevelUp = false;
+          screenLevelup.classList.add('hidden');
+        });
+        levelupOptionsEl.appendChild(btn);
+      });
+    }
+
+    // === DESTINY EVENTS (ฝนปลาทู / พายุรองเท้าแตะ) ================
+    function triggerRandomDestiny() {
+      const r = Math.random();
+      if (r < 0.5) {
+        state.destinyActive = 'fishRain';
+        state.destinyTimeLeft = 8;
+        showDestinyBanner('ฝนปลาทู! ศัตรูไถลไปมา');
+      } else {
+        state.destinyActive = 'sandalStorm';
+        state.destinyTimeLeft = 6;
+        showDestinyBanner('พายุรองเท้าแตะ! รองเท้าแตะสุ่มฟาดศัตรู');
+      }
+    }
+
+    function showDestinyBanner(text) {
+      destinyBanner.textContent = 'ดวงชะตาฟ้าลิขิต: ' + text;
+      destinyBanner.classList.remove('hidden');
+      setTimeout(() => {
+        destinyBanner.classList.add('hidden');
+      }, 3000);
+    }
+
+    function destinyEffects(dt) {
+      if (!state.destinyActive) return;
+      state.destinyTimeLeft -= dt;
+      if (state.destinyTimeLeft <= 0) {
+        state.destinyActive = null;
+        return;
+      }
+
+      if (state.destinyActive === 'fishRain') {
+        // ศัตรูเคลื่อนที่แปลก ๆ
+        state.enemies.forEach((e, i) => {
+          if (i % 3 === 0) {
+            e.x += Math.sin(state.time * 3 + i) * 30 * dt;
+          }
+        });
+      } else if (state.destinyActive === 'sandalStorm') {
+        // รองเท้าแตะสุ่มตกใส่ศัตรู
+        if (Math.random() < 0.6 * dt) {
+          const root = document.getElementById('game-root');
+          const rect = root.getBoundingClientRect();
+          const x = Math.random() * rect.width;
+          const target = state.enemies[Math.floor(Math.random() * state.enemies.length)];
+          if (target) {
+            target.hp -= 10 * state.stats.might;
+          }
+        }
+      }
+    }
+
+    // === GAME LOOP UPDATE ============================================
+    function update(dt) {
+      if (!state.running) return;
+      if (state.inLevelUp) return;
+
+      const root = document.getElementById('game-root');
+      const rect = root.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+
+      state.time += dt;
+      timeLabel.textContent = state.time.toFixed(1);
+
+      state.destinyTimer += dt;
+      if (state.destinyTimer > 30) {
+        state.destinyTimer = 0;
+        const luckBonus = state.stats.luck - 1;
+        if (Math.random() < 0.4 + luckBonus * 0.1) {
+          triggerRandomDestiny();
+        }
+      }
+
+      // movement
+      let mvx = 0, mvy = 0;
+      if (state.joystick.x !== 0 || state.joystick.y !== 0) {
+        mvx = state.joystick.x;
+        mvy = state.joystick.y;
+      } else {
+        if (state.keys['KeyW'] || state.keys['ArrowUp']) mvy -= 1;
+        if (state.keys['KeyS'] || state.keys['ArrowDown']) mvy += 1;
+        if (state.keys['KeyA'] || state.keys['ArrowLeft']) mvx -= 1;
+        if (state.keys['KeyD'] || state.keys['ArrowRight']) mvx += 1;
+      }
+
+      if (state.passiveEffects.sleepStun > 0) {
+        mvx = 0; mvy = 0;
+        state.passiveEffects.sleepStun -= dt;
+      }
+
+      if (mvx !== 0 || mvy !== 0) {
+        const len = Math.hypot(mvx, mvy) || 1;
+        mvx /= len;
+        mvy /= len;
+        state.player.x += mvx * state.player.speed * dt;
+        state.player.y += mvy * state.player.speed * dt;
+      }
+
+      const r = state.player.radius;
+      state.player.x = Math.max(r, Math.min(w - r, state.player.x));
+      state.player.y = Math.max(r, Math.min(h - r, state.player.y));
+
+      // shooting (cooldown based on stats.cooldown)
+      state.shootTimer += dt * 1000;
+      const shootInterval = 600 / state.stats.cooldown;
+      if (state.shootTimer > shootInterval) {
+        state.shootTimer = 0;
+        shootMainWeapon();
+      }
+
+      // burst skill
+      const burstLv = state.skills['burst'] || 0;
+      if (burstLv > 0) {
+        state.burstTimer += dt * 1000;
+        const interval = 2600 - (burstLv - 1) * 400;
+        if (state.burstTimer > interval) {
+          state.burstTimer = 0;
+          const count = 8 + (burstLv - 1) * 4;
+          for (let i = 0; i < count; i++) {
+            const a = (Math.PI * 2 * i) / count;
+            state.bullets.push({
+              x: state.player.x,
+              y: state.player.y,
+              radius: 3,
+              vx: Math.cos(a) * 260,
+              vy: Math.sin(a) * 260,
+              damage: state.baseDamage * 0.8 * state.stats.might,
+              type: 'burst'
+            });
+          }
+        }
+      }
+
+      // spin blade
+      if ((state.skills['blade'] || 0) > 0) {
+        state.spinBladeAngle += dt * 4;
+      }
+
+      // spawn enemies (affected by Curse)
+      state.spawnTimer += dt * 1000;
+      const curseSpawnFactor = state.stats.curse;
+      if (state.spawnTimer > state.spawnInterval / curseSpawnFactor) {
+        state.spawnTimer = 0;
+        spawnEnemy();
+        state.spawnInterval = Math.max(450, state.spawnInterval * 0.99);
+      }
+
+      // spawn boss around 60s
+      if (!state.bossSpawned && state.time > 60) {
+        spawnBoss();
+      }
+
+      // bullets move
+      for (let i = state.bullets.length - 1; i >= 0; i--) {
+        const b = state.bullets[i];
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
+        if (b.x < -40 || b.x > w + 40 || b.y < -40 || b.y > h + 40) {
+          state.bullets.splice(i, 1);
+        }
+      }
+
+      // destiny effects
+      destinyEffects(dt);
+
+      // enemies move & collisions
+      for (let i = state.enemies.length - 1; i >= 0; i--) {
+        const e = state.enemies[i];
+        const dx = state.player.x - e.x;
+        const dy = state.player.y - e.y;
+        const dist = Math.hypot(dx, dy) || 1;
+        let vx = (dx / dist) * e.speed;
+        let vy = (dy / dist) * e.speed;
+
+        if (e.type === 'ghost') {
+          vx *= 0.7; vy *= 0.7;
+        }
+        if (e.type === 'duck') {
+          const angleOffset = Math.sin(state.time * 2 + i) * 0.4;
+          const baseAngle = Math.atan2(dy, dx) + angleOffset;
+          vx = Math.cos(baseAngle) * e.speed;
+          vy = Math.sin(baseAngle) * e.speed;
+        }
+        if (state.destinyActive === 'fishRain') {
+          vy += 20;
+        }
+
+        e.x += vx * dt;
+        e.y += vy * dt;
+
+        if (e.isBoss && e.type === 'mathBoss') {
+          e.projTimer += dt * 1000;
+          if (e.projTimer > 1500) {
+            e.projTimer = 0;
+            const angle = Math.atan2(dy, dx);
+            state.bullets.push({
+              x: e.x,
+              y: e.y,
+              radius: 5,
+              vx: Math.cos(angle) * 190,
+              vy: Math.sin(angle) * 190,
+              damage: 20,
+              type: 'mathBoss'
+            });
+          }
+        }
+
+        // bullets hit enemy
+        for (let j = state.bullets.length - 1; j >= 0; j--) {
+          const b = state.bullets[j];
+          if (b.type === 'mathBoss') continue;
+          const d = Math.hypot(b.x - e.x, b.y - e.y);
+          if (d < e.radius + b.radius) {
+            let damage = b.damage;
+
+            const pepperLv = state.skills['pepper'] || 0;
+            if (pepperLv > 0 && Math.random() < 0.3 + 0.1 * pepperLv) {
+              e.speed *= 0.85;
+            }
+
+            if (b.type === 'chicken') {
+              damage *= 0.9;
+              const pieces = 3;
+              for (let k = 0; k < pieces; k++) {
+                const a = Math.random() * Math.PI * 2;
+                state.bullets.push({
+                  x: e.x,
+                  y: e.y,
+                  radius: 3,
+                  vx: Math.cos(a) * 200,
+                  vy: Math.sin(a) * 200,
+                  damage: damage * 0.4,
+                  type: 'shard'
+                });
+              }
+            }
+
+            if (b.type === 'fluff') {
+              const aoeR = 25 * state.stats.area;
+              state.enemies.forEach(e2 => {
+                const d2 = Math.hypot(e2.x - e.x, e2.y - e.y);
+                if (d2 < aoeR && e2 !== e) e2.hp -= damage * 0.5;
+              });
+            }
+
+            // evolve pepper -> gas AoE
+            if (state.pepperEvolved && state.weaponType === 'chicken') {
+              // (เอาแบบเบา ๆ) ข้ามไป
+            }
+
+            e.hp -= damage;
+            state.bullets.splice(j, 1);
+            if (e.hp <= 0) {
+              const xpGain = e.isBoss ? 15 : e.type === 'roach' ? 0.6 : 1.2;
+              state.player.xp += xpGain;
+              state.kills += 1;
+              killsLabel.textContent = state.kills.toString();
+
+              let goldDrop = e.goldValue || 1;
+              // roach farm
+              if (e.type === 'roach') goldDrop *= 2;
+              const luckFactor = state.stats.luck;
+              if (Math.random() < 0.2 * (luckFactor - 1)) {
+                goldDrop *= 1.5;
+              }
+              addGold(goldDrop);
+
+              // ลุงป๋อง passive: ขุมทรัพย์จากกองขยะ
+              if (state.passiveEffects.trashTreasure && Math.random() < 0.2 * state.stats.luck) {
+                state.player.xp += 1.5;
+              }
+
+              state.enemies.splice(i, 1);
+              if (e.isBoss) updateBossUi();
+              break;
+            } else {
+              if (e.isBoss) updateBossUi();
+            }
+          }
+        }
+
+        // enemy collide player
+        const dp = Math.hypot(e.x - state.player.x, e.y - state.player.y);
+        if (dp < e.radius + state.player.radius) {
+          let dmg = 10;
+          if (e.type === 'chicken') dmg = 15;
+          if (e.isBoss) dmg = 25;
+          if (e.type === 'roach') dmg = 5;
+
+          const bootsLv = state.skills['boots'] || 0;
+          if (bootsLv > 0) dmg *= (1 - 0.1 * bootsLv);
+
+          state.player.hp -= dmg;
+          updateHpUi();
+          if (!e.isBoss) {
+            state.enemies.splice(i, 1);
+          }
+
+          // ไก่ย่างวิ่งได้: ขโมยบัฟความเร็วชั่วคราว -> ลด speed เราเบา ๆ
+          if (e.type === 'chicken') {
+            state.player.speed *= 0.9;
+          }
+
+          if (state.player.hp <= 0) {
+            state.player.hp = 0;
+            updateHpUi();
+            state.running = false;
+            showGameOver();
+            return;
+          }
+        }
+      }
+
+      // mathBoss projectile hit player
+      for (let i = state.bullets.length - 1; i >= 0; i--) {
+        const b = state.bullets[i];
+        if (b.type !== 'mathBoss') continue;
+        const d = Math.hypot(b.x - state.player.x, b.y - state.player.y);
+        if (d < state.player.radius + b.radius) {
+          state.player.hp -= b.damage;
+          state.bullets.splice(i, 1);
+          updateHpUi();
+          if (state.player.hp <= 0) {
+            state.running = false;
+            showGameOver();
+            return;
+          }
+        }
+      }
+
+      // fan (ลมเย็น) / blade damage over time
+      const bladeLv = state.skills['blade'] || 0;
+      if (bladeLv > 0) {
+        const radius = (45 + bladeLv * 8) * state.stats.area;
+        const px = state.player.x + Math.cos(state.spinBladeAngle) * radius;
+        const py = state.player.y + Math.sin(state.spinBladeAngle) * radius;
+        const bladeR = 12 + bladeLv * 2;
+        state.enemies.forEach(e => {
+          const d = Math.hypot(e.x - px, e.y - py);
+          if (d < bladeR + e.radius) {
+            e.hp -= (8 + bladeLv * 4) * state.stats.might * dt;
+          }
+        });
+      }
+
+      const fanLv = state.skills['fan'] || 0;
+      if (fanLv > 0) {
+        const fanR = 60 * state.stats.area + fanLv * 10;
+        state.enemies.forEach(e => {
+          const d = Math.hypot(e.x - state.player.x, e.y - state.player.y);
+          if (d < fanR + e.radius) {
+            e.speed *= (1 - 0.3 * dt);
+            e.hp -= fanLv * 0.5 * dt;
+          }
+        });
+      }
+
+      // passive: แมวส้ม พลังงานแห่งความง่วง (สุ่มหลับตอนเลเวลอัปใน openLevelUp)
+      if (state.passiveEffects.sleepBuffTime > 0) {
+        state.passiveEffects.sleepBuffTime -= dt;
+        if (state.passiveEffects.sleepBuffTime <= 0) {
+          // หมดบัฟ
+          state.baseDamage /= 1.4;
+        }
+      }
+
+      // Level up
+      while (state.player.xp >= state.player.xpToNext) {
+        state.player.xp -= state.player.xpToNext;
+        state.player.level += 1;
+        state.player.xpToNext = Math.round(state.player.xpToNext * 1.4 + 3);
+        updateXpUi();
+        state.player.maxHp += 3;
+        state.player.hp += 3;
+        updateHpUi();
+
+        if (CHARACTERS[state.characterId].passive === 'sleepBuff') {
+          if (Math.random() < 0.25) {
+            state.passiveEffects.sleepStun = 2;
+            setTimeout(() => {
+              state.baseDamage *= 1.4;
+              state.passiveEffects.sleepBuffTime = 10;
+            }, 2000);
+          }
+        }
+
+        // 🔊 เล่นเสียงเวลาขึ้นเลเวล
+        playSfx('levelup');
+
+        openLevelUp();
+        break;
+      }
+
+
+      drawMiniMap();
+    }
+
+    // === DRAW ========================================================
+    function drawBackground() {
+      const root = document.getElementById('game-root');
+      const rect = root.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const img = SPRITES.stage[state.stageId];
+
+      if (img && img.complete) {
+        // วาดเต็มจอ ยืดรูปตามจอ (ง่ายสุด)
+        ctx.drawImage(img, 0, 0, w, h);
+      } else {
+        // ถ้ายังไม่มีรูป / ยังโหลดไม่เสร็จ ใช้ background เดิม
+        ctx.fillStyle = '#020617';
+        ctx.fillRect(0, 0, w, h);
+      }
+    }
+
+
+    function drawPlayer() {
+      const p = state.player;
+      const img = SPRITES.player[state.characterId];
+
+      if (img && img.complete) {
+        const size = 48; // ขนาดตัวละครบนจอ
+        ctx.save();
+        // วาดให้รูปอยู่กลางตัว
+        ctx.drawImage(img, p.x - size / 2, p.y - size / 2, size, size);
+        ctx.restore();
+      } else {
+        // ถ้ารูปยังโหลดไม่ทัน ใช้วงกลมแทนชั่วคราว
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = '#22d3ee';
+        ctx.fill();
+        ctx.strokeStyle = '#e5e7eb';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+
+    function drawAuxSkills() {
+      const bladeLv = state.skills['blade'] || 0;
+      if (bladeLv > 0) {
+        const radius = (45 + bladeLv * 8) * state.stats.area;
+        const px = state.player.x + Math.cos(state.spinBladeAngle) * radius;
+        const py = state.player.y + Math.sin(state.spinBladeAngle) * radius;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(px, py, 12 + bladeLv * 2, 0, Math.PI * 2);
+        ctx.fillStyle = '#fb7185';
+        ctx.fill();
+        ctx.restore();
+      }
+
+      const fanLv = state.skills['fan'] || 0;
+      if (fanLv > 0) {
+        const fanR = 60 * state.stats.area + fanLv * 10;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(state.player.x, state.player.y, fanR, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(129,140,248,0.3)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    function drawBullets() {
+      state.bullets.forEach(b => {
+        ctx.save();
+        if (b.type === 'stick') ctx.fillStyle = '#e5e7eb';
+        else if (b.type === 'chicken') ctx.fillStyle = '#fed7aa';
+        else if (b.type === 'fluff') ctx.fillStyle = '#f9a8d4';
+        else if (b.type === 'burst') ctx.fillStyle = '#a5b4fc';
+        else if (b.type === 'mathBoss') ctx.fillStyle = '#f97316';
+        else ctx.fillStyle = '#e5e7eb';
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        if (b.type === 'mathBoss') {
+          ctx.save();
+          ctx.fillStyle = '#f9a8d4';
+          ctx.font = '9px monospace';
+          ctx.fillText('x²+3?', b.x - 10, b.y - 8);
+          ctx.restore();
+        }
+      });
+    }
+
+    function drawEnemies() {
+      state.enemies.forEach(e => {
+        let spriteKey = e.type;
+        if (e.isBoss && e.type === 'mathBoss') {
+          spriteKey = 'mathBoss';
+        }
+
+        const img = SPRITES.monster[spriteKey];
+
+        if (img && img.complete) {
+          const size = e.isBoss ? 72 : 40;
+          ctx.save();
+          ctx.drawImage(img, e.x - size / 2, e.y - size / 2, size, size);
+          ctx.restore();
+        } else {
+          // fallback วงกลมแบบเดิม
+          let color = '#f87171';
+          if (e.type === 'slime') color = '#fb7185';
+          else if (e.type === 'roach') color = '#a3a3a3';
+          else if (e.type === 'chicken') color = '#fbbf24';
+          else if (e.type === 'duck') color = '#60a5fa';
+          else if (e.type === 'ghost') color = '#e5e7eb';
+          else if (e.isBoss && e.type === 'mathBoss') color = '#38bdf8';
+          else if (e.isBoss) color = '#f97316';
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(15,23,42,0.8)';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.restore();
+        }
+      });
+    }
+
+
+    function drawMiniMap() {
+      const root = document.getElementById('game-root');
+      const rect = root.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+      const mmRect = minimapEl.getBoundingClientRect();
+      const mmW = mmRect.width;
+      const mmH = mmRect.height;
+
+      minimapEl.innerHTML = '';
+      const mmCanvas = document.createElement('canvas');
+      mmCanvas.width = mmW;
+      mmCanvas.height = mmH;
+      const mmCtx = mmCanvas.getContext('2d');
+
+      mmCtx.fillStyle = 'rgba(15,23,42,1)';
+      mmCtx.fillRect(0, 0, mmW, mmH);
+
+      mmCtx.fillStyle = '#22c55e';
+      const px = (state.player.x / w) * mmW;
+      const py = (state.player.y / h) * mmH;
+      mmCtx.beginPath();
+      mmCtx.arc(px, py, 3, 0, Math.PI * 2);
+      mmCtx.fill();
+
+      const boss = state.enemies.find(e => e.isBoss);
+      if (boss) {
+        mmCtx.fillStyle = '#f97316';
+        const bx = (boss.x / w) * mmW;
+        const by = (boss.y / h) * mmH;
+        mmCtx.beginPath();
+        mmCtx.arc(bx, by, 3, 0, Math.PI * 2);
+        mmCtx.fill();
+      }
+
+      minimapEl.appendChild(mmCanvas);
+    }
+
+    function draw() {
+      drawBackground();
+      drawPlayer();
+      drawAuxSkills();
+      drawBullets();
+      drawEnemies();
+    }
+
+    // === GAME OVER ===================================================
+    function showGameOver() {
+      goTime.textContent = state.time.toFixed(1);
+      goKills.textContent = state.kills.toString();
+      goLevel.textContent = state.player.level.toString();
+      goGold.textContent = Math.round(state.goldRun).toString();
+
+      meta.gold += Math.round(state.goldRun);
+      saveMeta();
+
+      screenGameover.classList.remove('hidden');
+      bossHpContainer.classList.add('hidden');
+    }
+
+    // === START RUN ===================================================
+    function startRun() {
+      const root = document.getElementById('game-root');
+      const rect = root.getBoundingClientRect();
+
+      const c = CHARACTERS[state.characterId];
+      if (!c) return;
+
+      state.player.x = rect.width / 2;
+      state.player.y = rect.height / 2;
+
+      const hpUpLv = meta.powerups.hpUp || 0;
+      const speedUpLv = meta.powerups.speedUp || 0;
+      const mightUpLv = meta.powerups.mightUp || 0;
+      const luckUpLv = meta.powerups.luckUp || 0;
+
+      state.player.maxHp = c.hp + hpUpLv * 10;
+      state.player.hp = state.player.maxHp;
+      state.player.level = 1;
+      state.player.xp = 0;
+      state.player.xpToNext = 5;
+
+      state.baseDamage = c.baseDamage * (1 + mightUpLv * 0.1);
+      state.player.speed = c.speed + speedUpLv * 8;
+      state.weaponType = c.weaponType;
+
+      state.enemies = [];
+      state.bullets = [];
+      state.items = [];
+      state.skills = {};
+      state.stats = {
+        might: 1 + mightUpLv * 0.1,
+        area: 1,
+        cooldown: 1,
+        luck: 1 + luckUpLv * 0.1,
+        curse: 1
+      };
+      state.spinBladeAngle = 0;
+
+      state.time = 0;
+      state.kills = 0;
+      state.goldRun = 0;
+      state.spawnTimer = 0;
+      state.spawnInterval = 1300;
+      state.shootTimer = 0;
+      state.burstTimer = 0;
+      state.bossSpawned = false;
+      state.destinyTimer = 0;
+      state.destinyActive = null;
+      state.destinyTimeLeft = 0;
+      state.pepperEvolved = false;
+
+      state.passiveEffects.trashTreasure = c.passive === 'trashTreasure';
+      state.passiveEffects.crispyBuff = c.passive === 'crispyBuff';
+      state.passiveEffects.sleepBuff = c.passive === 'sleepBuff';
+      state.passiveEffects.sleepStun = 0;
+      state.passiveEffects.sleepBuffTime = 0;
+
+      state.running = true;
+      state.inLevelUp = false;
+
+      screenMainMenu.classList.add('hidden');
+      screenCharStage.classList.add('hidden');
+      screenLevelup.classList.add('hidden');
+      screenGameover.classList.add('hidden');
+      screenPowerups.classList.add('hidden');
+
+      updateHpUi();
+      updateXpUi();
+      killsLabel.textContent = '0';
+      goldRunLabel.textContent = '0';
+      updateSkillBar();
+      updateBossUi();
+    }
+
+    // === MAIN MENU BUTTONS ===========================================
+    btnMainStart.addEventListener('click', () => {
+      screenMainMenu.classList.add('hidden');
+      screenCharStage.classList.remove('hidden');
+    });
+
+    btnMainPowerups.addEventListener('click', () => {
+      screenPowerups.classList.remove('hidden');
+      buildPowerupCards();
+    });
+
+    btnClosePowerups.addEventListener('click', () => {
+      screenPowerups.classList.add('hidden');
+    });
+
+    btnStartRun.addEventListener('click', () => {
+      if (!state.characterId || !state.stageId) return;
+      startRun();
+    });
+
+    btnRestart.addEventListener('click', () => {
+      state.running = false;
+      screenGameover.classList.add('hidden');
+      screenMainMenu.classList.remove('hidden');
+      screenCharStage.classList.add('hidden');
+    });
+
+    // === LOOP ========================================================
+    function loop(timestamp) {
+      if (!state.lastTimestamp) state.lastTimestamp = timestamp;
+      const dt = (timestamp - state.lastTimestamp) / 1000;
+      state.lastTimestamp = timestamp;
+
+      update(dt);
+      draw();
+
+      requestAnimationFrame(loop);
+    }
+
+    // init
+    metaGoldLabel.textContent = meta.gold.toString();
+    metaGoldLabel2.textContent = meta.gold.toString();
+    buildCharacterCards();
+    buildStageCards();
+    updateCharStageSelection();
+    updateSkillBar();
+    updateBossUi();
+
+    loadAllSprites(); // โหลดรูป
+    loadSounds();     // โหลดเสียง  <<< เพิ่มบรรทัดนี้
+
+    requestAnimationFrame(loop);
+
+
+  </script>
+</body>
+</html>
