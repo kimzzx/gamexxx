@@ -44,33 +44,91 @@
       <!-- HP / EXP / TIME / GOLD -->
       <div class="flex flex-col gap-2 pointer-events-auto">
       </div>  
-        <!-- HP -->
-        <div class="flex items-center gap-2">
-          <span class="text-slate-200 text-[11px]">HP</span>
-          <div class="w-32 h-3 bg-slate-900/80 rounded-full overflow-hidden border border-slate-700/80">
-            <div id="hp-bar"
-                 class="h-full bg-gradient-to-r from-emerald-400 via-yellow-400 to-red-500"
-                 style="width:100%;"></div>
+        <!-- PLAYER HUD -->
+        <div class="flex flex-col gap-2
+                    px-3 py-2
+                    rounded-xl
+                    bg-slate-900/70
+                    backdrop-blur-md
+                    border border-slate-700/80
+                    shadow-lg
+                    w-fit">
+
+          <!-- HP BAR -->
+          <div class="flex items-center gap-2">
+            <span class="text-emerald-300 text-xs font-semibold drop-shadow">
+              ❤️ HP
+            </span>
+
+            <div class="w-40 h-4 rounded-full overflow-hidden
+                        bg-slate-950/90
+                        border border-slate-700">
+
+              <div id="hp-bar"
+                class="h-full
+                      bg-gradient-to-r from-emerald-400 via-yellow-400 to-red-500
+                      transition-all duration-300 ease-out
+                      shadow-[0_0_10px_rgba(34,197,94,0.6)]"
+                style="width:100%;">
+              </div>
+            </div>
           </div>
-        </div>
-        <!-- EXP -->
-        <div class="flex items-center gap-2">
-          <span class="text-slate-200 text-[11px]">
-            LV <span id="level-label" class="text-cyan-300 font-semibold">1</span>
-          </span>
-          <div class="w-40 h-2.5 bg-slate-900/80 rounded-full overflow-hidden border border-indigo-600/80">
-            <div id="xp-bar"
-                 class="h-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-cyan-300"
-                 style="width:0%;"></div>
+
+          <!-- EXP BAR -->
+          <div class="flex items-center gap-2">
+            <span class="text-cyan-300 text-xs font-semibold drop-shadow">
+              ✨ LV <span id="level-label" class="font-bold">1</span>
+            </span>
+
+            <div class="w-44 h-3 rounded-full overflow-hidden
+                        bg-slate-950/90
+                        border border-indigo-600/80">
+
+              <div id="xp-bar"
+                class="h-full
+                      bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-cyan-400
+                      transition-all duration-300 ease-out
+                      shadow-[0_0_10px_rgba(99,102,241,0.6)]"
+                style="width:0%;">
+              </div>
+            </div>
           </div>
+
         </div>
-        <!-- Stats -->
-        <div class="flex flex-wrap gap-2 text-[11px] text-slate-300">
-          <span>⏱ <span id="time-label" class="text-cyan-300 font-semibold">0.0</span>s</span>
-          <span>☠ ฆ่าแล้ว <span id="kills-label" class="text-emerald-300 font-semibold">0</span></span>
-          <span>💰 รอบนี้ <span id="gold-run-label" class="text-yellow-300 font-semibold">0</span></span>
+        <!-- Stats Panel -->
+        <div class="flex flex-wrap gap-2
+                    px-3 py-2
+                    rounded-xl
+                    bg-slate-900/70
+                    backdrop-blur-md
+                    border border-slate-700/80
+                    shadow-lg
+                    text-xs sm:text-sm
+                    text-slate-200">
+
+          <!-- Time -->
+          <div class="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-cyan-500/10">
+            <span class="text-cyan-300">⏱</span>
+            <span id="time-label" class="font-semibold text-cyan-300">0.0</span>
+            <span class="text-cyan-400/80">s</span>
+          </div>
+
+          <!-- Kills -->
+          <div class="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-emerald-500/10">
+            <span class="text-emerald-300">☠</span>
+            <span class="text-emerald-400/80">ฆ่า</span>
+            <span id="kills-label" class="font-semibold text-emerald-300">0</span>
+          </div>
+
+          <!-- Gold -->
+          <div class="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-yellow-500/10">
+            <span class="text-yellow-300">💰</span>
+            <span class="text-yellow-400/80">รอบนี้</span>
+            <span id="gold-run-label" class="font-semibold text-yellow-300">0</span>
+          </div>
+
         </div>
-      </div>
+
 
       <!-- MINI MAP + DESTINY EVENT BANNER -->
       <div class="pointer-events-auto flex flex-col items-end gap-2">
@@ -124,11 +182,32 @@
       </div>
     </div>
 
-    <!-- MOBILE JOYSTICK -->
+    <!-- RESPONSIVE JOYSTICK -->
     <div id="joystick"
-        class="absolute bottom-20 left-4 sm:bottom-6 w-24 h-24 rounded-full bg-slate-900/40 border border-slate-600/80 flex items-center justify-center select-none sm:opacity-80">
-      <div id="joystick-knob" class="w-10 h-10 rounded-full bg-slate-100/80 shadow-md"></div>
+      class="absolute
+            bottom-32 sm:bottom-6
+            left-4
+            w-28 h-28
+            md:w-32 md:h-32
+            lg:w-36 lg:h-36
+            rounded-full
+            bg-slate-900/40
+            border border-slate-600/80
+            flex items-center justify-center
+            select-none
+            opacity-90
+            touch-none">
+
+      <div id="joystick-knob"
+        class="w-12 h-12
+              md:w-14 md:h-14
+              lg:w-16 lg:h-16
+              rounded-full
+              bg-slate-100/80
+              shadow-md">
+      </div>
     </div>
+
 
 
     <!-- MAIN MENU -->
