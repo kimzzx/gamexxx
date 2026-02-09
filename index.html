@@ -32,6 +32,11 @@
       display: block;
       touch-action: none;
     }
+
+    #fj-base {
+      transition: opacity 0.15s ease;
+    }
+
   </style>
 </head>
 <body class="bg-slate-950 text-white">
@@ -183,31 +188,21 @@
       </div>
     </div>
 
-    <!-- RESPONSIVE JOYSTICK -->
-    <div id="joystick"
-      class="absolute
-            bottom-32 sm:bottom-6
-            left-4
-            w-28 h-28
-            md:w-32 md:h-32
-            lg:w-36 lg:h-36
-            rounded-full
-            bg-slate-900/40
-            border border-slate-600/80
-            flex items-center justify-center
-            select-none
-            opacity-90
-            touch-none">
-
-      <div id="joystick-knob"
-        class="w-12 h-12
-              md:w-14 md:h-14
-              lg:w-16 lg:h-16
-              rounded-full
-              bg-slate-100/80
-              shadow-md">
+    <!-- FLOATING JOYSTICK -->
+    <div id="fj-base"
+      class="fixed z-50 pointer-events-none hidden
+            w-28 h-28 rounded-full
+            bg-slate-900/50 border border-cyan-400/60
+            backdrop-blur-md flex items-center justify-center">
+      <div id="fj-knob"
+        class="w-12 h-12 rounded-full
+              bg-cyan-300/90 shadow-lg">
       </div>
     </div>
+
+
+
+
 
 
 
@@ -435,6 +430,68 @@
   </div>
 
   <script>
+
+
+    /* ================= FLOATING JOYSTICK ================= */
+    const fjBase = document.getElementById("fj-base");
+    const fjKnob = document.getElementById("fj-knob");
+
+    let fjActive = false;
+    let fjStartX = 0;
+    let fjStartY = 0;
+    const fjMaxDist = 40; // ระยะลากสูงสุด
+    let fjVector = { x: 0, y: 0 };
+
+    function setJoystick(x, y) {
+      fjBase.style.left = (x - 56) + "px";
+      fjBase.style.top  = (y - 56) + "px";
+    }
+
+    function updateKnob(dx, dy) {
+      const dist = Math.hypot(dx, dy);
+      const clamped = Math.min(dist, fjMaxDist);
+      const angle = Math.atan2(dy, dx);
+
+      const kx = Math.cos(angle) * clamped;
+      const ky = Math.sin(angle) * clamped;
+
+      fjKnob.style.transform = `translate(${kx}px, ${ky}px)`;
+
+      fjVector.x = kx / fjMaxDist;
+      fjVector.y = ky / fjMaxDist;
+    }
+
+    function resetJoystick() {
+      fjKnob.style.transform = `translate(0,0)`;
+      fjVector.x = 0;
+      fjVector.y = 0;
+    }
+
+    /* TOUCH */
+    window.addEventListener("touchstart", e => {
+      const t = e.touches[0];
+      fjActive = true;
+      fjStartX = t.clientX;
+      fjStartY = t.clientY;
+
+      setJoystick(fjStartX, fjStartY);
+      fjBase.classList.remove("hidden");
+    }, { passive: true });
+
+    window.addEventListener("touchmove", e => {
+      if (!fjActive) return;
+      const t = e.touches[0];
+      updateKnob(t.clientX - fjStartX, t.clientY - fjStartY);
+    }, { passive: true });
+
+    window.addEventListener("touchend", () => {
+      fjActive = false;
+      fjBase.classList.add("hidden");
+      resetJoystick();
+    }, { passive: true });
+
+
+
     // === SUPABASE CONFIG (ใช้ชื่อตัวแปร db เพื่อกันการประกาศซ้ำ) ===
     const supabaseUrl = "https://fgwfvxowufopmtbhmnac.supabase.co";
     const supabaseKey = "sb_publishable_DFMfPZqCQgime6wUojvb6w_Zf8g7e8H";
@@ -669,9 +726,6 @@
     const bossHpContainer = document.getElementById('boss-hp-container');
     const bossHpBar = document.getElementById('boss-hp-bar');
     const bossNameLabel = document.getElementById('boss-name');
-
-    const joystick = document.getElementById('joystick');
-    const joystickKnob = document.getElementById('joystick-knob');
 
     const screenMainMenu = document.getElementById('screen-main-menu');
     const screenCharStage = document.getElementById('screen-char-stage');
@@ -1175,68 +1229,6 @@
       state.keys[e.code] = false;
     });
 
-    // === INPUT: JOYSTICK =============================================
-    function updateJoystickFromEvent(e) {
-      const rect = joystick.getBoundingClientRect();
-      let clientX, clientY;
-      if (e.touches && e.touches.length > 0) {
-        clientX = e.touches[0].clientX;
-        clientY = e.touches[0].clientY;
-      } else {
-        clientX = e.clientX;
-        clientY = e.clientY;
-      }
-      const cx = rect.width / 2;
-      const cy = rect.height / 2;
-      const x = clientX - rect.left;
-      const y = clientY - rect.top;
-      let dx = x - cx;
-      let dy = y - cy;
-      const dist = Math.hypot(dx, dy) || 1;
-      const maxDist = rect.width / 2 - 10;
-      if (dist > maxDist) {
-        dx = dx / dist * maxDist;
-        dy = dy / dist * maxDist;
-      }
-      joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
-      if (dist > 10) {
-        state.joystick.x = dx / dist;
-        state.joystick.y = dy / dist;
-      } else {
-        state.joystick.x = 0;
-        state.joystick.y = 0;
-      }
-    }
-    function resetJoystick() {
-      state.joystick.x = 0;
-      state.joystick.y = 0;
-      joystickKnob.style.transform = 'translate(0,0)';
-      state.joystick.active = false;
-    }
-
-    joystick.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      state.joystick.active = true;
-      updateJoystickFromEvent(e);
-    }, { passive: false });
-    joystick.addEventListener('touchmove', (e) => {
-      e.preventDefault();
-      if (!state.joystick.active) return;
-      updateJoystickFromEvent(e);
-    }, { passive: false });
-    joystick.addEventListener('touchend', (e) => { e.preventDefault(); resetJoystick(); }, { passive: false });
-    joystick.addEventListener('touchcancel', (e) => { e.preventDefault(); resetJoystick(); }, { passive: false });
-
-    joystick.addEventListener('mousedown', (e) => {
-      e.preventDefault();
-      state.joystick.active = true;
-      updateJoystickFromEvent(e);
-    });
-    window.addEventListener('mousemove', (e) => {
-      if (!state.joystick.active) return;
-      updateJoystickFromEvent(e);
-    });
-    window.addEventListener('mouseup', resetJoystick);
 
     // === UI: BUILD CHARACTER / STAGE / POWERUPS ======================
     function buildCharacterCards() {
@@ -1871,13 +1863,16 @@ function updateEffects(dt) {
       }
 
       
-
       // movement
       let mvx = 0, mvy = 0;
-      if (state.joystick.x !== 0 || state.joystick.y !== 0) {
-        mvx = state.joystick.x;
-        mvy = state.joystick.y;
-      } else {
+
+      // เช็กค่าจาก Floating Joystick (fjVector) ที่เราเขียนไว้ด้านบน
+      if (fjActive && (fjVector.x !== 0 || fjVector.y !== 0)) {
+        mvx = fjVector.x;
+        mvy = fjVector.y;
+      } 
+      // ถ้าไม่ได้ใช้จอย ให้เช็กคีย์บอร์ด
+      else {
         if (state.keys['KeyW'] || state.keys['ArrowUp']) mvy -= 1;
         if (state.keys['KeyS'] || state.keys['ArrowDown']) mvy += 1;
         if (state.keys['KeyA'] || state.keys['ArrowLeft']) mvx -= 1;
