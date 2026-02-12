@@ -6,7 +6,6 @@
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Survivors of the Absurd</title>
 
-  <!-- TailwindCSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
@@ -41,15 +40,11 @@
 </head>
 <body class="bg-slate-950 text-white">
   <div id="game-root" class="relative w-screen h-screen overflow-hidden">
-    <!-- GAME CANVAS -->
     <canvas id="game" class="w-full h-full"></canvas>
 
-    <!-- HUD TOP -->
     <div class="absolute top-0 inset-x-0 p-3 flex items-start justify-between pointer-events-none text-xs">
-      <!-- HP / EXP / TIME / GOLD -->
       <div class="flex flex-col gap-2 pointer-events-auto">
       </div>  
-        <!-- PLAYER HUD -->
         <div class="flex flex-col gap-2
                     px-3 py-2
                     rounded-xl
@@ -59,7 +54,6 @@
                     shadow-lg
                     w-fit">
 
-          <!-- HP BAR -->
           <div class="flex items-center gap-2">
             <span class="text-emerald-300 text-xs font-semibold drop-shadow">
               ❤️ HP
@@ -79,7 +73,6 @@
             </div>
           </div>
 
-          <!-- EXP BAR -->
           <div class="flex items-center gap-2">
             <span class="text-cyan-300 text-xs font-semibold drop-shadow">
               ✨ LV <span id="level-label" class="font-bold">1</span>
@@ -100,7 +93,6 @@
           </div>
 
         </div>
-        <!-- Stats Panel -->
         <div class="flex flex-wrap gap-2
                     px-3 py-2
                     rounded-xl
@@ -111,21 +103,18 @@
                     text-xs sm:text-sm
                     text-slate-200">
 
-          <!-- Time -->
           <div class="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-cyan-500/10">
             <span class="text-cyan-300">⏱</span>
             <span id="time-label" class="font-semibold text-cyan-300">0.0</span>
             <span class="text-cyan-400/80">s</span>
           </div>
 
-          <!-- Kills -->
           <div class="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-emerald-500/10">
             <span class="text-emerald-300">☠</span>
             <span class="text-emerald-400/80">ฆ่า</span>
             <span id="kills-label" class="font-semibold text-emerald-300">0</span>
           </div>
 
-          <!-- Gold -->
           <div class="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-yellow-500/10">
             <span class="text-yellow-300">💰</span>
             <span class="text-yellow-400/80">รอบนี้</span>
@@ -135,7 +124,6 @@
         </div>
 
 
-      <!-- MINI MAP + DESTINY EVENT BANNER -->
       <div class="pointer-events-auto flex flex-col items-end gap-2">
         <div class="bg-slate-900/80 border border-slate-700 rounded-xl p-2 w-28">
           <div class="flex items-center justify-between mb-1">
@@ -151,7 +139,6 @@
           ดวงชะตาฟ้าลิขิต: -
         </div>
 
-        <!-- 🎧 Volume Control -->
         <div class="mt-1 flex items-center gap-2 bg-slate-900/80 border border-slate-700 rounded-full px-2 py-1 text-[10px]">
           <span class="text-slate-300">🔊</span>
           <input id="volume-slider" type="range"
@@ -161,7 +148,6 @@
       </div>
       </div>
 
-    <!-- HUD BOTTOM: WEAPON / PASSIVE BAR -->
     <div class="absolute bottom-0 inset-x-0 pb-2 px-3 pointer-events-none text-[10px]">
       <div class="max-w-3xl mx-auto bg-slate-900/90 border border-slate-700/60 rounded-2xl px-3 py-2 flex flex-col gap-1">
         <div class="flex items-center justify-between text-slate-300">
@@ -169,26 +155,39 @@
           <span class="text-[9px] text-slate-500">สูงสุด 6 ช่อง</span>
         </div>
         <div id="skill-bar" class="grid grid-cols-3 sm:grid-cols-6 gap-1">
-          <!-- ช่องสกิลสร้างด้วย JS -->
-        </div>
+          </div>
       </div>
     </div>
     
 
-    <!-- BOSS HP -->
     <div id="boss-hp-container"
-         class="absolute top-12 inset-x-0 flex justify-center pointer-events-none hidden">
-      <div class="bg-slate-900/90 border border-fuchsia-500/70 rounded-full px-3 py-1 shadow-lg backdrop-blur">
-        <div id="boss-name" class="text-[11px] text-fuchsia-200 text-center mb-1">Boss HP</div>
-        <div class="w-60 h-2.5 bg-slate-800/80 rounded-full overflow-hidden border border-fuchsia-500/70">
-          <div id="boss-hp-bar"
-               class="h-full bg-gradient-to-r from-red-500 via-fuchsia-400 to-purple-500"
-               style="width:100%;"></div>
+         class="absolute top-16 inset-x-0 z-50 flex flex-col items-center justify-center pointer-events-none hidden transition-opacity duration-500">
+      
+      <div class="flex items-center gap-3 mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+        <span class="text-2xl animate-pulse">☠️</span>
+        <h1 id="boss-name" 
+            class="text-2xl font-black text-red-100 tracking-widest uppercase"
+            style="font-family: impact, sans-serif; -webkit-text-stroke: 1px #7f1d1d;">
+          UNKNOWN BOSS
+        </h1>
+        <span class="text-2xl animate-pulse">☠️</span>
+      </div>
+
+      <div class="relative w-[90%] max-w-2xl h-8 bg-slate-950 rounded-full border-2 border-red-900/80 shadow-[0_0_30px_rgba(220,38,38,0.6)] overflow-hidden">
+        
+        <div class="absolute inset-0 opacity-20" 
+             style="background-image: linear-gradient(45deg, #7f1d1d 25%, transparent 25%, transparent 50%, #7f1d1d 50%, #7f1d1d 75%, transparent 75%, transparent); background-size: 20px 20px;">
+        </div>
+
+        <div id="boss-hp-bar"
+             class="h-full bg-gradient-to-r from-red-800 via-red-600 to-orange-500 transition-all duration-200 ease-out relative shadow-[0_0_15px_rgba(255,100,100,0.5)]"
+             style="width: 100%;">
+             
+             <div class="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/40 to-transparent"></div>
         </div>
       </div>
     </div>
 
-    <!-- FLOATING JOYSTICK -->
     <div id="fj-base"
       class="fixed z-50 pointer-events-none hidden
             w-28 h-28 rounded-full
@@ -206,7 +205,6 @@
 
 
 
-    <!-- MAIN MENU -->
     <div id="screen-main-menu"
          class="absolute inset-0 bg-slate-950/90 backdrop-blur flex items-center justify-center z-40">
       <div class="bg-slate-900/90 border border-slate-700/80 rounded-3xl p-6 max-w-xl w-[92%] shadow-2xl">
@@ -225,22 +223,10 @@
                   class="col-span-2 py-2 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-semibold transition">
             ▶ เริ่มเกม
           </button>
-          <button
-            class="w-full py-3 bg-slate-800 hover:bg-slate-700 border border-cyan-500/50 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
-            ตัวละคร
-          </button>
           <button id="btn-main-powerups"
             class="w-full py-3 bg-slate-800 hover:bg-slate-700 border border-cyan-500/50 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-[0_0_15px_rgba(45,160,101,0.94)]">
             Power-ups
           </button>
-          <!-- <button
-            class="w-full py-3 bg-slate-800 hover:bg-slate-700 border border-cyan-500/50 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
-            Collection
-          </button> -->
-          <!-- <button
-            class="w-full py-3 bg-slate-800 hover:bg-slate-700 border border-cyan-500/50 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
-            Secrets
-          </button> -->
           <button id="btnLeaderboard"
             class="w-full py-3 bg-slate-800 hover:bg-slate-700 border border-cyan-500/50 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
             🌐 LEADERBOARD
@@ -252,7 +238,6 @@
       </div>
     </div>
 
-    <!-- POWER-UPS MENU -->
     <div id="screen-powerups"
          class="absolute inset-0 bg-slate-950/80 backdrop-blur flex items-center justify-center z-50 hidden">
       <div class="bg-slate-900/95 border border-emerald-500/60 rounded-3xl p-5 max-w-xl w-[96%] shadow-2xl text-xs">
@@ -268,32 +253,26 @@
           <span class="text-slate-500">* ทองได้จากการเล่นแต่ละรอบ</span>
         </div>
         <div id="powerup-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <!-- เติมด้วย JS -->
-        </div>
+          </div>
       </div>
     </div>
 
-    <!-- CHARACTER & STAGE SELECT -->
     <div id="screen-char-stage"
          class="absolute inset-0 bg-slate-950/90 backdrop-blur flex items-center justify-center z-30 hidden">
       <div class="bg-slate-900/95 border border-slate-700 rounded-3xl p-5 max-w-4xl w-[96%] shadow-2xl text-xs">
         <h2 class="text-lg font-semibold text-center mb-2">เลือกตัวละคร & ด่าน</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Characters -->
           <div>
             <h3 class="text-[11px] text-slate-300 mb-2">ตัวละคร (Characters)</h3>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" id="character-list">
-              <!-- เติมด้วย JS -->
-            </div>
+              </div>
           </div>
 
-          <!-- Stages -->
           <div>
             <h3 class="text-[11px] text-slate-300 mb-2">ด่าน (Stages)</h3>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" id="stage-list">
-              <!-- เติมด้วย JS -->
-            </div>
+              </div>
           </div>
         </div>
 
@@ -309,7 +288,6 @@
       </div>
     </div>
 
-    <!-- LEVEL UP -->
     <div id="screen-levelup"
          class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-30 hidden">
       <div class="bg-slate-900/95 border border-slate-700 rounded-3xl p-5 max-w-3xl w-[96%] shadow-2xl text-xs">
@@ -318,12 +296,10 @@
           เลือก 1 อย่างจากตัวเลือกด้านล่าง
         </p>
         <div id="levelup-options" class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-          <!-- เติมด้วย JS -->
-        </div>
+          </div>
       </div>
     </div>
 
-    <!-- GAME OVER -->
     <div id="screen-gameover"
          class="absolute inset-0 bg-slate-950/85 backdrop-blur flex items-center justify-center z-40 hidden">
       <div class="bg-slate-900/95 border border-slate-700 rounded-3xl p-6 max-w-sm w-[92%] text-center shadow-2xl text-xs">
@@ -337,32 +313,6 @@
         <button id="btn-restart"
                 class="mt-3 w-full py-2.5 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-semibold text-sm transition">
           กลับสู่เมนูหลัก
-        </button>
-      </div>
-    </div>
-
-    <div id="scoreboard" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[60] flex items-center justify-center p-4">
-      <div class="bg-slate-900 border-2 border-cyan-500 rounded-3xl p-6 w-full max-w-lg shadow-[0_0_30px_rgba(6,182,212,0.4)]">
-        <h2 class="text-2xl font-black text-cyan-400 mb-6 text-center tracking-tighter uppercase italic">🏆 Global Leaderboard 🏆</h2>
-        
-        <div class="overflow-y-auto max-h-[350px] mb-6 pr-2 custom-scrollbar">
-          <table class="w-full text-left text-sm">
-            <thead class="sticky top-0 bg-slate-900 text-cyan-300 border-b border-slate-700">
-              <tr>
-                <th class="py-2 px-2">นักสู้</th>
-                <th class="py-2 px-2 text-center">☠ Kills</th>
-                <th class="py-2 px-2 text-center">💰 Gold</th>
-                <th class="py-2 px-2 text-center">⏱ Time</th>
-              </tr>
-            </thead>
-            <tbody id="scoreboardBody" class="divide-y divide-slate-800 text-slate-200">
-              </tbody>
-          </table>
-        </div>
-
-        <button onclick="closeScoreboard()" 
-                class="w-full py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold rounded-2xl transition-all active:scale-95 shadow-lg">
-          CLOSE
         </button>
       </div>
     </div>
@@ -399,6 +349,11 @@
         
         <div class="space-y-4">
           <div>
+            <label class="block text-xs text-cyan-300 mb-1 ml-2">USERNAME (ชื่อที่จะโชว์ในอันดับ)</label>
+            <input type="text" id="auth-username" placeholder="ตั้งชื่อเท่ๆ ของมึง" 
+                  class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-cyan-500 transition-all text-white mb-4">
+          </div>
+          <div>
             <label class="block text-xs text-cyan-300 mb-1 ml-2">EMAIL</label>
             <input type="email" id="auth-email" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-cyan-500 transition-all text-white">
           </div>
@@ -417,12 +372,6 @@
           </p>
         </div>
       </div>
-    </div>
-
-    <div>
-      <label class="block text-xs text-cyan-300 mb-1 ml-2">USERNAME (ชื่อที่จะโชว์ในอันดับ)</label>
-      <input type="text" id="auth-username" placeholder="ตั้งชื่อเท่ๆ ของมึง" 
-            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-cyan-500 transition-all text-white mb-4">
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -470,6 +419,9 @@
     /* TOUCH */
     window.addEventListener("touchstart", e => {
       const t = e.touches[0];
+      // ตรวจสอบว่าไม่ได้กดปุ่ม UI
+      if(e.target.closest('button') || e.target.closest('.pointer-events-auto')) return;
+      
       fjActive = true;
       fjStartX = t.clientX;
       fjStartY = t.clientY;
@@ -506,10 +458,12 @@
     // --- LEADERBOARD FUNCTIONS ---
     async function saveScoreOnline() {
       const timePlayed = Math.floor(state.time);
+      const finalName = playerSession.name || "Anonymous";
+
       const { error } = await db.from("leaderboard").insert([{
-        name: playerSession.name,
+        name: finalName,
         kills: state.kills,
-        gold: state.goldRun,
+        gold: Math.round(state.goldRun),
         time: timePlayed
       }]);
       if (error) console.error("Save Error:", error.message);
@@ -519,7 +473,8 @@
       const body = document.getElementById('scoreboardBody');
       body.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-slate-500 italic animate-pulse">กำลังโหลดข้อมูล...</td></tr>`;
       
-      document.getElementById('scoreboard').classList.remove('hidden');
+      const scoreboard = document.getElementById('scoreboard');
+      scoreboard.classList.remove('hidden');
 
       const { data, error } = await db
         .from("leaderboard")
@@ -528,7 +483,7 @@
         .limit(10);
 
       if (error) {
-        body.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-400">โหลดข้อมูลไม่สำเร็จ</td></tr>`;
+        body.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-400">โหลดข้อมูลไม่สำเร็จ: ${error.message}</td></tr>`;
         return;
       }
 
@@ -547,53 +502,20 @@
       });
     }
 
-    function closeScoreboard() {
-      document.getElementById('scoreboard').classList.add('hidden');
-    }
-    
     // 1. ประกาศตัวแปรปุ่ม (วางรวมกับ DOM Elements อื่นๆ)
     const btnLeaderboard = document.getElementById('btnLeaderboard');
     const btnCloseScoreboard = document.getElementById('btnCloseScoreboard');
     const scoreboardScreen = document.getElementById('scoreboard');
 
-    // 2. ฟังก์ชันโหลดข้อมูล (เปลี่ยน supabaseUrl และ Key เป็นของมึงด้วยนะ)
-    const sbUrl = "https://fgwfvxowufopmtbhmnac.supabase.co";
-    const sbKey = "sb_publishable_DFMfPZqCQgime6wUojvb6w_Zf8g7e8H";
-    const sb = window.supabase.createClient(sbUrl, sbKey);
 
     async function openLeaderboard() {
-      const body = document.getElementById('scoreboardBody');
-      body.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-slate-500 italic animate-pulse">กำลังดึงข้อมูล...</td></tr>`;
-      scoreboardScreen.classList.remove('hidden');
-
-      const { data, error } = await sb
-        .from("leaderboard")
-        .select("*")
-        .order("kills", { ascending: false })
-        .limit(10);
-
-      if (error) {
-        body.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-400">Error: ${error.message}</td></tr>`;
-        return;
-      }
-
-      body.innerHTML = "";
-      data.forEach((p, i) => {
-        const tr = document.createElement("tr");
-        tr.className = `hover:bg-slate-800/50 transition-colors ${i < 3 ? 'bg-cyan-500/5' : ''}`;
-        tr.innerHTML = `
-          <td class="py-3 px-2 font-medium ${i < 3 ? 'text-yellow-400' : ''}">${i+1}. ${p.name}</td>
-          <td class="py-3 px-2 text-center text-emerald-400 font-bold">${p.kills}</td>
-          <td class="py-3 px-2 text-center text-yellow-500">${p.gold}</td>
-          <td class="py-3 px-2 text-center text-cyan-300">${p.time}s</td>
-        `;
-        body.appendChild(tr);
-      });
+      // เรียกใช้ฟังก์ชันเดิมที่เขียนไว้แล้ว
+      loadLeaderboard();
     }
 
     // 3. ผูก Event กับปุ่ม
-    btnLeaderboard.addEventListener('click', openLeaderboard);
-    btnCloseScoreboard.addEventListener('click', () => {
+    if(btnLeaderboard) btnLeaderboard.addEventListener('click', openLeaderboard);
+    if(btnCloseScoreboard) btnCloseScoreboard.addEventListener('click', () => {
       scoreboardScreen.classList.add('hidden');
     });
 
@@ -605,6 +527,7 @@
     const btnSwitchAuth = document.getElementById('btn-switch-auth');
     const authEmail = document.getElementById('auth-email');
     const authPassword = document.getElementById('auth-password');
+    const authUsername = document.getElementById('auth-username');
 
     // สลับโหมด Login / Register
     btnSwitchAuth.addEventListener('click', () => {
@@ -619,6 +542,7 @@
     btnDoAuth.addEventListener('click', async () => {
       const email = authEmail.value;
       const password = authPassword.value;
+      const username = authUsername ? authUsername.value : "";
 
       if (!email || !password) return alert("กรุณากรอกข้อมูลให้ครบ!");
 
@@ -629,7 +553,11 @@
       if (isLoginMode) {
         result = await db.auth.signInWithPassword({ email, password });
       } else {
-        result = await db.auth.signUp({ email, password });
+         result = await db.auth.signUp({ 
+          email, 
+          password,
+          options: { data: { display_name: username } } 
+        });
       }
 
       const { data, error } = result;
@@ -643,7 +571,7 @@
         } else if (data.user) {
           // Login สำเร็จ
           screenAuth.classList.add('hidden');
-          playerSession.name = data.user.email.split('@')[0]; // ใช้ชื่อหน้า Email เป็นชื่อในเกมชั่วคราว
+          playerSession.name = data.user.user_metadata.display_name || data.user.email.split('@')[0];
           console.log("Welcome:", playerSession.name);
         }
       }
@@ -656,7 +584,7 @@
       const { data: { session } } = await db.auth.getSession();
       if (session) {
         screenAuth.classList.add('hidden');
-        playerSession.name = session.user.email.split('@')[0];
+        playerSession.name = session.user.user_metadata.display_name || session.user.email.split('@')[0];
       }
     }
     checkUser();
@@ -666,51 +594,6 @@
       location.reload(); // รีโหลดหน้าเว็บเพื่อกลับไปหน้า Login
     }
 
-
-    // 1. ตอน Register ให้ส่งชื่อไปด้วย
-    btnDoAuth.addEventListener('click', async () => {
-      const email = authEmail.value;
-      const password = authPassword.value;
-      const username = document.getElementById('auth-username').value;
-
-      if (isLoginMode) {
-        result = await db.auth.signInWithPassword({ email, password });
-      } else {
-        // ส่ง username เข้าไปเก็บใน metadata ของ user
-        result = await db.auth.signUp({ 
-          email, 
-          password,
-          options: { data: { display_name: username } } 
-        });
-      }
-      
-      const { data, error } = result;
-      if (data.user) {
-        // เก็บชื่อไว้ใช้ในเกม
-        playerSession.name = data.user.user_metadata.display_name || data.user.email.split('@')[0];
-        screenAuth.classList.add('hidden');
-      }
-    });
-
-    // 2. แก้ฟังก์ชัน Save Score ให้ใช้ชื่อจาก playerSession
-    async function saveScoreOnline() {
-      const timePlayed = Math.floor(state.time);
-      
-      // ใช้ชื่อจาก session ถ้าไม่มีให้ใช้ชื่อสุ่ม
-      const finalName = playerSession.name || "Anonymous";
-
-      const { error } = await db.from("leaderboard").insert([{
-        name: finalName, 
-        kills: state.kills,
-        gold: Math.round(state.goldRun),
-        time: timePlayed
-      }]);
-
-      if (error) {
-        console.error("Save Error:", error.message);
-        // ถ้าติด RLS ให้มึงเช็ค Policies ในหน้าเว็บ Supabase อีกรอบ
-      }
-    }
 
     // === DOM =========================================================
     const canvas = document.getElementById('game');
@@ -791,222 +674,186 @@
 
 
     // === META (LOCALSTORAGE) =========================================
-    const META_KEY = 'soa_meta_v1';
+    const META_KEY = 'soa_meta_v2'; // เปลี่ยนเวอร์ชันเพื่อรีเซ็ตค่าเก่าที่อาจจะบัค
+
     function loadMeta() {
       try {
         const raw = localStorage.getItem(META_KEY);
-        if (!raw) return { gold: 0, powerups: {} };
+        // ค่าเริ่มต้น
+        const defaultMeta = { 
+            gold: 0, 
+            powerups: {}, 
+            unlockedCharacters: ['pong'],
+            unlockedStages: ['garbage'] // เริ่มต้นปลดแค่ด่านแรก
+        };
+        
+        if (!raw) return defaultMeta;
+        
         const obj = JSON.parse(raw);
         if (!obj.powerups) obj.powerups = {};
         if (typeof obj.gold !== 'number') obj.gold = 0;
+        if (!Array.isArray(obj.unlockedCharacters)) obj.unlockedCharacters = ['pong'];
+        // เช็คว่ามีข้อมูลด่านหรือยัง ถ้าไม่มีให้ใส่ด่านแรก
+        if (!Array.isArray(obj.unlockedStages)) obj.unlockedStages = ['garbage'];
+        
         return obj;
       } catch (e) {
-        return { gold: 0, powerups: {} };
+        return { gold: 0, powerups: {}, unlockedCharacters: ['pong'], unlockedStages: ['garbage'] };
       }
     }
+
     function saveMeta() {
       localStorage.setItem(META_KEY, JSON.stringify(meta));
-      metaGoldLabel.textContent = meta.gold.toString();
-      metaGoldLabel2.textContent = meta.gold.toString();
+      // อัปเดตตัวเลขทองในหน้าเมนูทันที
+      if(metaGoldLabel) metaGoldLabel.textContent = meta.gold.toString();
+      if(metaGoldLabel2) metaGoldLabel2.textContent = meta.gold.toString();
     }
+
     const meta = loadMeta();
 
     // === GAME DEFINITIONS ============================================
     const CHARACTERS = {
       pong: {
         id: 'pong',
-        name: 'ลุงป๋องเก็บขยะพลังวิเศษ',
-        desc: 'ไม้เก็บของวิญญาณ | Passive: ขุมทรัพย์จากกองขยะ',
+        name: 'ลุงป๋อง เจ้าพ่อรีไซเคิล',
+        desc: 'อาวุธ: ไม้คีบขยะ | Skill: เรียกป้อมปืนถังขยะช่วยยิงอัตโนมัติ',
         color: 'border-emerald-400/60 hover:border-emerald-300',
-        hp: 130,
-        speed: 210,
-        baseDamage: 1.4,
+        hp: 200,
+        speed: 200,
+        baseDamage: 2.5,
         weaponType: 'stick',
-        passive: 'trashTreasure'
-      },
-      ning: {
-        id: 'ning',
-        name: 'เจ๊หนิงขายไก่ทอดลอยฟ้า',
-        desc: 'น่องไก่ยักษ์ระเบิด | Passive: สูตรลับความกรอบ',
-        color: 'border-amber-400/60 hover:border-amber-300',
-        hp: 110,
-        speed: 225,
-        baseDamage: 1.5,
-        weaponType: 'chicken',
-        passive: 'crispyBuff'
+        passive: 'trashTurret',
+        price: 0
       },
       cat: {
         id: 'cat',
         name: 'น้องแมวส้มเมี้ยวบ้าพลัง',
-        desc: 'ก้อนขนฟูฟ่อง | Passive: พลังงานแห่งความง่วง',
+        desc: 'อาวุธ: ก้อนขนมรณะ | Skill: วิ่งชนศัตรูตายเกลื่อนจอทุกๆ 15 วิ',
         color: 'border-fuchsia-400/60 hover:border-fuchsia-300',
-        hp: 120,
-        speed: 230,
+        hp: 100,
+        speed: 240,
         baseDamage: 1.3,
         weaponType: 'fluff',
-        passive: 'sleepBuff'
-      }
+        passive: 'zoomies',
+        price: 300
+      },
+      ning: {
+        id: 'ning',
+        name: 'เจ๊หนิง ไก่ทอดนรกแตก',
+        desc: 'อาวุธ: น่องไก่ระเบิด | Skill: สาดน้ำมันเดือดเผาพื้น สร้าง Area Damage',
+        color: 'border-amber-400/60 hover:border-amber-300',
+        hp: 120,
+        speed: 215,
+        baseDamage: 1.6,
+        weaponType: 'chicken',
+        passive: 'boilingOil',
+        price: 600
+      },
+
     };
 
     const STAGES = {
       garbage: {
         id: 'garbage',
         name: 'ทุ่งขยะสุดสยอง',
-        desc: 'ด่านเริ่มต้น มีขยะเต็มพื้น',
-        theme: 'garbage'
+        desc: 'Quest: กำจัด "ราชาหนูท่อ" เพื่อปลดล็อกด่านต่อไป',
+        bossType: 'ratKing', // บอสประจำด่าน
+        nextStage: 'market'  // ด่านที่จะปลดล็อก
       },
       market: {
         id: 'market',
         name: 'ตลาดสดพลังเพี้ยน',
-        desc: 'มีกับดักเขียงหมู ผักผลไม้เคลื่อนที่ได้',
-        theme: 'market'
+        desc: 'Quest: กำจัด "หมูสับปังตอ" เพื่อปลดล็อกด่านต่อไป',
+        bossType: 'butcherPig',
+        nextStage: 'classroom'
       },
       classroom: {
         id: 'classroom',
         name: 'ห้องเรียนโกลาหล',
-        desc: 'โต๊ะเก้าอี้ขวางทาง บอสคืออาจารย์ใหญ่คณิต',
-        theme: 'classroom'
+        desc: 'Quest: เอาชนะ "อาจารย์ใหญ่" ให้ได้!',
+        bossType: 'mathBoss',
+        nextStage: null // ด่านสุดท้าย
       }
     };
 
-    const SKILLS = [
+const SKILLS = [
       {
         id: 'multi',
         type: 'weapon',
-        name: 'ยิงหลายทิศ',
+        name: 'ปืนกลทะลวง (Multi-Shot)',
         maxLevel: 5,
         descLv: [
-          'เพิ่มกระสุน +1 ทิศ',
-          'กระสุนเพิ่ม +2 ทิศ',
-          'เพิ่มความแรงเล็กน้อย',
-          'กระจายมุมกว้างขึ้น',
-          'ยิงพรุ่งแบบสุดโหด'
+          'เพิ่มกระสุน +1 และเจาะทะลุศัตรู 1 ตัว',
+          'กระสุน +2 เจาะทะลุ 2 ตัว',
+          'ยิงเร็วขึ้น + กระสุนใหญ่ขึ้น',
+          'ยิงกระจาย 5 ทิศทาง เจาะทะลุ 3 ตัว',
+          'GOD MODE: กระสุนท่วมจอ เจาะทุกอย่าง!'
         ]
       },
       {
         id: 'blade',
         type: 'weapon',
-        name: 'ดาบหมุนรอบตัว',
+        name: 'กงจักรสังหาร (Spin Blade)',
         maxLevel: 4,
         descLv: [
-          'วงดาบหมุนรอบตัว',
-          'เพิ่มรัศมีและดาเมจ',
-          'หมุนเร็วขึ้น',
-          'วงดาบหนาแน่นรอบตัว'
+          'เรียกกงจักรหมุนรอบตัว ดาเมจสูง',
+          'หมุนเร็วขึ้น + รัศมีกว้างขึ้น',
+          'ดาเมจแรงโคตร + หมุนติ้วๆ',
+          'พื้นที่สังหาร: ศัตรูที่เข้าใกล้จะละลายทันที'
         ]
       },
       {
         id: 'boots',
         type: 'passive',
-        name: 'รองเท้าบูท 7 ลี้',
+        name: 'รองเท้าไฟบรรลัยกัลป์',
         maxLevel: 4,
         descLv: [
-          'เพิ่มความเร็ววิ่ง',
-          'ชนศัตรูทำดาเมจนิดหน่อย',
-          'ลดดาเมจที่ได้รับเล็กน้อย',
-          'เร็วจัด ใกล้วิ่งทะลุมิติ'
+          'วิ่งเร็วขึ้น + ทิ้งรอยไฟเผาศัตรู',
+          'ไฟแรงขึ้น + วิ่งเร็วขึ้นอีก',
+          'ลดดาเมจที่ได้รับ 20% + ชนศัตรูกระเด็น',
+          'THE FLASH: วิ่งชนศัตรูแตกกระเจิง'
         ]
       },
       {
         id: 'pepper',
         type: 'weapon',
-        name: 'หนังสติ๊กพริกไทย',
+        name: 'ระเบิดพริกไทย (Pepper Bomb)',
         maxLevel: 4,
         descLv: [
-          'กระสุนมีโอกาสสโลว์',
-          'สโลว์นานขึ้น',
-          'สโลว์แรงขึ้น',
-          'สโลว์เป็นวงเล็ก ๆ'
+          'โยนขวดพริกไทยระเบิดเป็นวงกว้าง',
+          'ระเบิดแรงขึ้น + สโลว์ศัตรู',
+          'วงระเบิดใหญ่เท่าบ้าน',
+          'NUKE: ระเบิดทีหายทั้งจอ'
         ]
       },
       {
         id: 'fan',
         type: 'weapon',
-        name: 'พัดลมไอเย็น',
+        name: 'พายุเยือกแข็ง (Ice Storm)',
         maxLevel: 3,
         descLv: [
-          'วงลมเย็นสโลว์รอบตัว',
-          'รัศมีกว้างขึ้น',
-          'ทำดาเมจต่อเนื่องเบา ๆ'
+          'ออร่าความเย็นรอบตัว สโลว์+ดาเมจ',
+          'เพิ่มแรงผลัก (Knockback) ให้ศัตรูเข้าไม่ถึงตัว',
+          'แช่แข็งศัตรูจนตายคาที่'
         ]
       },
       {
         id: 'burst',
         type: 'weapon',
-        name: 'พุ่งกระสุนรอบตัว',
+        name: 'คลื่นพลังทำลาย (Nova Burst)',
         maxLevel: 3,
         descLv: [
-          'ยิงกระสุน 8 ทิศเป็นช่วง ๆ',
-          'เพิ่มความถี่ในการพุ่ง',
-          'สองชั้นต่อเนื่อง'
+          'ปล่อยคลื่นพลังรอบตัวผลักศัตรู',
+          'ยิงถี่ขึ้น + แรงขึ้น 2 เท่า',
+          'SUPER NOVA: ระเบิดพลังทำลายล้างรอบทิศ'
         ]
       },
-      // Stats
-      {
-        id: 'might',
-        type: 'stat',
-        name: 'Might (พลังโจมตี)',
-        maxLevel: 5,
-        descLv: [
-          'เพิ่มดาเมจทั้งหมดเล็กน้อย',
-          'เพิ่มดาเมจอีกเล็กน้อย',
-          'ดาเมจเริ่มโหดขึ้น',
-          'ดาเมจแรงมาก',
-          'พลังทำลายล้างสุดขีด'
-        ]
-      },
-      {
-        id: 'area',
-        type: 'stat',
-        name: 'Area (พื้นที่โจมตี)',
-        maxLevel: 5,
-        descLv: [
-          'เพิ่มขนาดเอฟเฟกต์อาวุธ',
-          'พื้นที่ใหญ่ขึ้นอีก',
-          'วงดาบ/ลมเย็นกว้างขึ้น',
-          'แทบทั้งจอกลายเป็นเขตอันตราย',
-          'Area ระดับบ้าเลือด'
-        ]
-      },
-      {
-        id: 'cooldown',
-        type: 'stat',
-        name: 'Cooldown (คูลดาวน์)',
-        maxLevel: 5,
-        descLv: [
-          'ลดคูลดาวน์เล็กน้อย',
-          'ยิงถี่ขึ้น',
-          'ยิงแทบไม่พัก',
-          'อาวุธแทบยิงรัวตลอดเวลา',
-          'Cooldown แทบหายไป'
-        ]
-      },
-      {
-        id: 'luck',
-        type: 'stat',
-        name: 'Luck (โชคดี)',
-        maxLevel: 5,
-        descLv: [
-          'มีโอกาสได้สกิลดีมากขึ้น',
-          'ดรอปของดีบ่อยขึ้น',
-          'เหตุการณ์ดวงดีถี่ขึ้น',
-          'โชคโคตรดี',
-          'โชคแตกสุด ๆ'
-        ]
-      },
-      {
-        id: 'curse',
-        type: 'stat',
-        name: 'Curse (คำสาป)',
-        maxLevel: 5,
-        descLv: [
-          'เพิ่มจำนวน/ความเร็วมอนเล็กน้อย (แลก EXP)',
-          'มอนเยอะขึ้นอีก',
-          'ท่วมจอ แต่ฟาร์มสุดมัน',
-          'มอนเยอะจนจอแทบแตก',
-          'โหมดนรกของจริง'
-        ]
-      }
+      // ... (Stats พวก might, area, cooldown, luck, curse ปล่อยไว้เหมือนเดิมได้)
+      { id: 'might', type: 'stat', name: 'Might (พลังโจมตี)', maxLevel: 5, descLv: ['+10%','+20%','+30%','+50%','+100% DAM!'] },
+      { id: 'area', type: 'stat', name: 'Area (ขนาดสกิล)', maxLevel: 5, descLv: ['+10%','+20%','+40%','+60%','GIANT SIZE!'] },
+      { id: 'cooldown', type: 'stat', name: 'Cooldown (รัว)', maxLevel: 5, descLv: ['-10%','-20%','-30%','-40%','MACHINE GUN!'] },
+      { id: 'luck', type: 'stat', name: 'Luck (ดวง)', maxLevel: 5, descLv: ['Luck+1','Luck+2','Luck+3','Luck+5','LUCKY GOD!'] },
+      { id: 'curse', type: 'stat', name: 'Curse (คำสาป)', maxLevel: 5, descLv: ['ศัตรูเยอะขึ้น','เยอะขึ้นอีก','เยอะฉิบหาย','นรกแตก','ตายซะ!'] }
     ];
 
     const POWER_UP_DEFS = [
@@ -1057,7 +904,9 @@
       chicken:  'assets/monsters/chicken.png',
       duck:     'assets/monsters/duck.png',
       ghost:    'assets/monsters/ghost.png',
-      mathBoss: 'assets/monsters/mathBoss.png'
+      mathBoss: 'assets/monsters/mathBoss.png',
+      ratKing:    'assets/monsters/rat_king.png',
+      butcherPig: 'assets/monsters/pig_butcher.png'
     }
   };
 
@@ -1120,13 +969,6 @@
     SFX.levelup = levelUp;
   }
 
-  function loadSounds() {
-    // เสียงเลเวลอัป
-    const levelUp = new Audio('assets/sfx/levelup.mp3');
-    levelUp.volume = 0.7; // ปรับความดัง 0.0 - 1.0
-    SFX.levelup = levelUp;
-  }
-
   function playSfx(name) {
     const s = SFX[name];
     if (!s) return;
@@ -1177,10 +1019,11 @@
       goldRun: 0,
       lastTimestamp: 0,
       spawnTimer: 0,
-      spawnInterval: 1300,
+      spawnInterval: 1500,
       shootTimer: 0,
       burstTimer: 0,
       bossSpawned: false,
+      portal: null,
 
       destinyTimer: 0,
       destinyActive: null,
@@ -1190,11 +1033,17 @@
       joystick: { x: 0, y: 0, active: false },
 
       passiveEffects: {
-        trashTreasure: false,
-        crispyBuff: false,
-        sleepBuff: false,
-        sleepStun: 0,
-        sleepBuffTime: 0
+        // Pong
+        trashTurretTimer: 0,
+        
+        // Ning
+        oilPuddles: [], // เก็บตำแหน่งบ่อน้ำมัน {x, y, life, radius}
+        oilTimer: 0,
+
+        // Cat
+        zoomiesActive: false,
+        zoomiesTimer: 0,
+        zoomiesDuration: 0
       },
 
       pepperEvolved: false, // ปืนใหญ่แก๊สน้ำตาพริกไทย
@@ -1233,41 +1082,129 @@
     // === UI: BUILD CHARACTER / STAGE / POWERUPS ======================
     function buildCharacterCards() {
       characterListEl.innerHTML = '';
+      
       for (const id in CHARACTERS) {
         const c = CHARACTERS[id];
-        const btn = document.createElement('button');
-        btn.className =
-          `char-card text-left rounded-2xl border bg-slate-900/80 px-3 py-2 hover:bg-slate-800/80 transition ${c.color}`;
-        btn.dataset.charId = id;
-        btn.innerHTML = `
-          <div class="text-[10px] text-slate-400 mb-1 uppercase">${id}</div>
-          <div class="text-[13px] font-semibold mb-1">${c.name}</div>
-          <div class="text-[11px] text-slate-300 leading-snug">${c.desc}</div>
+        // เช็กว่าตัวนี้ซื้อไปรึยัง?
+        const isUnlocked = meta.unlockedCharacters.includes(id);
+
+        const btn = document.createElement('div'); // เปลี่ยนจาก button เป็น div เพื่อคุม layout เอง
+        
+        // ถ้ายังไม่ซื้อ ให้การ์ดดูมืดๆ หน่อย
+        const bgClass = isUnlocked ? 'bg-slate-900/80' : 'bg-slate-950/90 grayscale-[0.5]';
+        const borderClass = isUnlocked ? c.color : 'border-slate-700';
+
+        btn.className = `char-card relative flex flex-col justify-between text-left rounded-2xl border ${bgClass} ${borderClass} px-3 py-2 transition group overflow-hidden`;
+        
+        // เนื้อหาในการ์ด
+        let htmlContent = `
+          <div>
+            <div class="flex justify-between items-start">
+              <div class="text-[10px] text-slate-400 mb-1 uppercase">${id}</div>
+              ${!isUnlocked ? `<div class="text-[10px] text-yellow-400 font-bold">🔒 LOCKED</div>` : ''}
+            </div>
+            <div class="text-[13px] font-semibold mb-1 text-slate-100">${c.name}</div>
+            <div class="text-[11px] text-slate-300 leading-snug">${c.desc}</div>
+          </div>
         `;
-        btn.addEventListener('click', () => {
-          state.characterId = id;
-          updateCharStageSelection();
-        });
+
+        // ปุ่มด้านล่าง (เลือก หรือ ซื้อ)
+        if (isUnlocked) {
+          htmlContent += `
+            <button class="btn-select mt-2 w-full py-1.5 rounded-lg bg-slate-700 hover:bg-cyan-600 text-[11px] font-bold text-white transition">
+              SELECT
+            </button>
+          `;
+        } else {
+            // เช็กเงินใหม่สดๆ ตอนนี้เลย
+            const currentAfford = meta.gold >= c.price;
+            htmlContent += `
+                <button class="btn-buy mt-2 w-full py-1.5 rounded-lg ${currentAfford ? 'bg-yellow-600 hover:bg-yellow-500' : 'bg-slate-800 opacity-50 cursor-not-allowed'} text-[11px] font-bold text-white transition flex items-center justify-center gap-1">
+                💰 BUY (${c.price})
+                </button>
+            `;
+        }
+
+        btn.innerHTML = htmlContent;
         characterListEl.appendChild(btn);
+
+        // --- Event Listeners ---
+        if (isUnlocked) {
+          // Logic การเลือกตัวละคร
+          const selectBtn = btn.querySelector('.btn-select');
+          btn.addEventListener('click', () => selectCharacter(id)); // คลิกที่การ์ดก็ได้
+          selectBtn.addEventListener('click', (e) => {
+             e.stopPropagation();
+             selectCharacter(id);
+          });
+          // เก็บ ref ไว้ใส่ effect ตอนเลือก
+          btn.dataset.charId = id; 
+
+        } else {
+          // Logic การซื้อตัวละคร
+          const buyBtn = btn.querySelector('.btn-buy');
+          buyBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // ไม่ให้ bubble ไป trigger อย่างอื่น
+            
+            // เช็กเงินอีกรอบตอนกด
+            if (meta.gold >= c.price) {
+              if (confirm(`ยืนยันการซื้อ "${c.name}" ในราคา ${c.price} ทอง?`)) {
+                // หักเงิน
+                meta.gold -= c.price;
+                // ปลดล็อก
+                meta.unlockedCharacters.push(id);
+                // เซฟและรีเฟรชหน้า
+                saveMeta();
+                buildCharacterCards(); // สร้างการ์ดใหม่เพื่อเปลี่ยนปุ่มเป็น Select
+                playSfx('levelup'); // เล่นเสียงดีใจหน่อย (ถ้ามี)
+              }
+            } else {
+              alert("เงินไม่พอจ้า! ไปฟาร์มมาก่อนนะ");
+            }
+          });
+        }
       }
+      
+      // เรียก update selection เพื่อไฮไลท์ตัวที่เลือกอยู่
+      updateCharStageSelection();
+    }
+
+    // ฟังก์ชันช่วยสำหรับการเลือก (แยกออกมาจะได้เรียกซ้ำง่ายๆ)
+    function selectCharacter(id) {
+      state.characterId = id;
+      updateCharStageSelection();
     }
 
     function buildStageCards() {
       stageListEl.innerHTML = '';
       Object.values(STAGES).forEach(s => {
+        // เช็คว่าปลดล็อกหรือยัง
+        const isUnlocked = meta.unlockedStages.includes(s.id);
+
         const btn = document.createElement('button');
-        btn.className =
-          'stage-card text-left rounded-2xl border border-slate-600 bg-slate-900/80 px-3 py-2 hover:bg-slate-800/80 transition';
+        const bgClass = isUnlocked ? 'bg-slate-900/80 hover:bg-slate-800/80' : 'bg-slate-950/60 opacity-60 cursor-not-allowed';
+        const borderClass = isUnlocked ? 'border-slate-600' : 'border-slate-800';
+
+        btn.className = `stage-card text-left rounded-2xl border ${borderClass} ${bgClass} px-3 py-2 transition relative overflow-hidden`;
         btn.dataset.stageId = s.id;
-        btn.innerHTML = `
+
+        let html = `
           <div class="text-[10px] text-slate-400 mb-1 uppercase">${s.id}</div>
-          <div class="text-[13px] font-semibold mb-1">${s.name}</div>
-          <div class="text-[11px] text-slate-300 leading-snug">${s.desc}</div>
+          <div class="text-[13px] font-semibold mb-1 flex items-center gap-2">
+            ${s.name} ${!isUnlocked ? '🔒' : ''}
+          </div>
+          <div class="text-[11px] text-slate-300 leading-snug">${isUnlocked ? s.desc : '??? (ต้องผ่านด่านก่อนหน้า)'}</div>
         `;
-        btn.addEventListener('click', () => {
-          state.stageId = s.id;
-          updateCharStageSelection();
-        });
+        
+        btn.innerHTML = html;
+        
+        if (isUnlocked) {
+          btn.addEventListener('click', () => {
+            state.stageId = s.id;
+            updateCharStageSelection();
+          });
+        }
+        
         stageListEl.appendChild(btn);
       });
     }
@@ -1387,7 +1324,8 @@
       const t = Math.random();
       let type = 'slime';
       let radius = 12;
-      let baseHp = 3 + state.time * 0.08;
+      // ลดความโหดลง
+      let baseHp = 2 + state.time * 0.04;
       let speed = 60;
       let xp = 1;
       let goldValue = 1;
@@ -1429,30 +1367,38 @@
       const root = document.getElementById('game-root');
       const rect = root.getBoundingClientRect();
       const w = rect.width;
-      const h = rect.height;
+      
+      // ดึงประเภทบอสมาจาก Config ของ Stage
+      const stageConfig = STAGES[state.stageId];
+      const type = stageConfig ? stageConfig.bossType : 'ratKing';
 
-      let type = 'boss';
-      if (state.stageId === 'classroom') type = 'mathBoss';
-
-      const hpBase = 200 + state.time * 2;
+      // ลดเลือดบอสลงเยอะ
+      const hpBase = 150 + state.time * 2; 
       const curseFactor = 1 + (state.stats.curse - 1) * 0.7;
 
       state.enemies.push({
         x: w / 2,
-        y: -60,
-        radius: 32,
-        speed: 40,
+        y: -100, // เกิดเหนือจอ
+        radius: 40, // ★ ขยาย hitbox ให้ใหญ่ขึ้น (เดิม 32)
+        speed: 50,
         hp: hpBase * curseFactor,
         maxHp: hpBase * curseFactor,
-        type,
+        type: type,
         isBoss: true,
-        projTimer: 0,
-        goldValue: 30,
-        hitFlash: 0   // ★ เพิ่ม
+        
+        // ตัวแปรสำหรับสกิลบอส
+        actionTimer: 0, 
+        state: 'idle', // idle, attack, dash
+        
+        goldValue: 100,
+        hitFlash: 0
       });
 
       state.bossSpawned = true;
       updateBossUi();
+      
+      // ประกาศเตือน
+      showDestinyBanner("⚠️ BOSS WARNING: " + type.toUpperCase() + " ⚠️");
     }
 
     function updateBossUi() {
@@ -1462,62 +1408,74 @@
         return;
       }
       bossHpContainer.classList.remove('hidden');
-      bossNameLabel.textContent =
-        boss.type === 'mathBoss' ? 'อาจารย์ใหญ่คณิตศาสตร์' : 'Boss';
+      
+      let nameShow = 'Unknown Boss';
+      if (boss.type === 'ratKing') nameShow = 'ราชาหนูท่อ (The Rat King)';
+      if (boss.type === 'butcherPig') nameShow = 'หมูสับปังตอ (The Butcher)';
+      if (boss.type === 'mathBoss') nameShow = 'อาจารย์ใหญ่ (The Headmaster)';
+
+      bossNameLabel.textContent = nameShow;
       const ratio = boss.hp / boss.maxHp;
       bossHpBar.style.width = `${Math.max(0, Math.min(1, ratio)) * 100}%`;
     }
 
     // === SHOOT / SKILLS ==============================================
-    function shootMainWeapon() {
+function shootMainWeapon() {
       if (state.enemies.length === 0) return;
       const p = state.player;
-
-      // ถ้าแมวกำลังหลับ -> หยุดยิง
       if (state.passiveEffects.sleepStun > 0) return;
 
+      // ค้นหาเป้าหมายที่ใกล้ที่สุด
       let target = null;
       let bestDist = Infinity;
       state.enemies.forEach(e => {
         const d = Math.hypot(e.x - p.x, e.y - p.y);
         if (d < bestDist) { bestDist = d; target = e; }
       });
+
       if (!target) return;
 
       const dx = target.x - p.x;
       const dy = target.y - p.y;
-      let angle = Math.atan2(dy, dx);
-      const baseSpeed = 310;
+      let baseAngle = Math.atan2(dy, dx);
+      const baseSpeed = 400; // เร็วขึ้น
 
-      const bulletsAngles = [];
       const multiLv = state.skills['multi'] || 0;
-      const countExtra = multiLv;
-      const spread = (10 + multiLv * 6) * Math.PI / 180;
+      
+      // จำนวนกระสุนและมุมกระจาย
+      let count = 1 + multiLv; 
+      // เลเวลสูงๆ ยิงเยอะขึ้นแบบก้าวกระโดด
+      if (multiLv >= 4) count += 2; 
+      if (multiLv >= 5) count += 4;
 
-      bulletsAngles.push(angle);
-      for (let i = 1; i <= countExtra; i++) {
-        bulletsAngles.push(angle + spread * i);
-        bulletsAngles.push(angle - spread * i);
-      }
+      const spread = (5 + multiLv * 2) * (Math.PI / 180); // องศากระจาย
 
       let dmgBase = state.baseDamage * state.stats.might;
-
-      // เจ๊หนิง: บัฟความกรอบเมื่อ HP < 50%
       if (state.passiveEffects.crispyBuff && state.player.hp < state.player.maxHp * 0.5) {
-        dmgBase *= 1.3;
+        dmgBase *= 1.5;
       }
 
-      bulletsAngles.forEach(a => {
+      // คำนวณ Pierce (เจาะทะลุ)
+      let pierceCount = multiLv; 
+      if (multiLv >= 5) pierceCount += 10; // เลเวล 5 เจาะยับ
+
+      for (let i = 0; i < count; i++) {
+        // คำนวณมุมเพื่อให้กระสุนกระจายออกซ้ายขวาเท่าๆ กัน
+        const offset = (i - (count - 1) / 2) * spread;
+        const finalAngle = baseAngle + offset;
+
         state.bullets.push({
           x: p.x,
           y: p.y,
-          radius: 4,
-          vx: Math.cos(a) * baseSpeed,
-          vy: Math.sin(a) * baseSpeed,
+          radius: 5 + (multiLv), // กระสุนใหญ่ขึ้นตามเลเวล
+          vx: Math.cos(finalAngle) * baseSpeed,
+          vy: Math.sin(finalAngle) * baseSpeed,
           damage: dmgBase,
-          type: state.weaponType
+          type: state.weaponType,
+          pierce: pierceCount, // ★ ใส่ค่าเจาะทะลุ
+          life: 2 // อายุขัยกระสุน (วินาที)
         });
-      });
+      }
     }
 
     function applySkillLevel(id, level) {
@@ -1636,7 +1594,6 @@
         }
       }
     }
-
 
 
     // === DROPS & EFFECTS ==========================================
@@ -1908,20 +1865,27 @@ function updateEffects(dt) {
       const burstLv = state.skills['burst'] || 0;
       if (burstLv > 0) {
         state.burstTimer += dt * 1000;
-        const interval = 2600 - (burstLv - 1) * 400;
+        // คูลดาวน์ไวขึ้น
+        const interval = Math.max(500, 3000 - (burstLv * 600)) / state.stats.cooldown;
+        
         if (state.burstTimer > interval) {
           state.burstTimer = 0;
-          const count = 8 + (burstLv - 1) * 4;
+          const count = 12 + burstLv * 4; // ยิงเยอะขึ้น (12, 16, 20 นัด)
+          
+          // เล่นเสียงยิง (ถ้ามี)
+          // playSfx('shoot'); 
+
           for (let i = 0; i < count; i++) {
             const a = (Math.PI * 2 * i) / count;
             state.bullets.push({
               x: state.player.x,
               y: state.player.y,
-              radius: 3,
-              vx: Math.cos(a) * 260,
-              vy: Math.sin(a) * 260,
-              damage: state.baseDamage * 0.8 * state.stats.might,
-              type: 'burst'
+              radius: 4 + burstLv, // ลูกใหญ่ขึ้น
+              vx: Math.cos(a) * 350,
+              vy: Math.sin(a) * 350,
+              damage: state.baseDamage * 2 * state.stats.might, // แรงกว่ากระสุนปกติ 2 เท่า
+              type: 'burst',
+              pierce: 100 // เจาะทะลุหมด!
             });
           }
         }
@@ -1959,20 +1923,97 @@ function updateEffects(dt) {
       // destiny effects
       destinyEffects(dt);
 
+      // === PORTAL LOGIC ===
+      if (state.portal && state.portal.active) {
+          state.portal.timer += dt;
+          
+          // เช็คการชน (Player vs Portal)
+          const dist = Math.hypot(state.player.x - state.portal.x, state.player.y - state.portal.y);
+          if (dist < state.player.radius + state.portal.radius - 15) {
+              finishStage(); // เข้าประตูแล้วจบเกม!
+          }
+      }
+
       // enemies move & collisions
       for (let i = state.enemies.length - 1; i >= 0; i--) {
         const e = state.enemies[i];
-
-        if (e.hitFlash > 0) {
-          e.hitFlash -= dt;
-          if (e.hitFlash < 0) e.hitFlash = 0;
-        }
 
         const dx = state.player.x - e.x;
         const dy = state.player.y - e.y;
         const dist = Math.hypot(dx, dy) || 1;
         let vx = (dx / dist) * e.speed;
         let vy = (dy / dist) * e.speed;
+
+        // --- BOSS AI LOGIC ---
+        if (e.isBoss) {
+            e.actionTimer += dt;
+
+            // 1. บอสหนู (Rat King): เรียกลูกน้องทุก 5 วิ
+            if (e.type === 'ratKing') {
+                if (e.actionTimer > 5) {
+                    e.actionTimer = 0;
+                    // เรียกลูกน้อง 3 ตัว
+                    for(let k=0; k<3; k++) {
+                        state.enemies.push({
+                            x: e.x + (Math.random()-0.5)*100,
+                            y: e.y + (Math.random()-0.5)*100,
+                            radius: 8, speed: 140, hp: 10, maxHp: 10,
+                            type: 'roach', goldValue: 1, hitFlash: 0
+                        });
+                    }
+                }
+            }
+            
+            // 2. บอสหมู (Butcher): พุ่งชน (Dash) ทุก 4 วิ
+            else if (e.type === 'butcherPig') {
+                if (e.state === 'dashing') {
+                    // กำลังพุ่ง
+                    if (e.actionTimer > 0.5) { // พุ่งเสร็จ
+                        e.state = 'idle';
+                        e.actionTimer = 0;
+                        e.speed = 40; // กลับความเร็วเดิม
+                    }
+                } else {
+                    // รอพุ่ง
+                    if (e.actionTimer > 4) {
+                        e.state = 'dashing';
+                        e.actionTimer = 0;
+                        e.speed = 350; // ความเร็วตอนพุ่ง
+                        // พุ่งไปหาผู้เล่น
+                        const angle = Math.atan2(state.player.y - e.y, state.player.x - e.x);
+                        vx = Math.cos(angle) * e.speed;
+                        vy = Math.sin(angle) * e.speed;
+                    }
+                }
+                
+                // Override velocity ถ้ากำลังพุ่ง (เพื่อให้พุ่งตรงๆ ไม่เลี้ยวตาม)
+                if (e.state === 'dashing') {
+                   // ให้มันพุ่งทิศเดิม (ต้องเก็บ vector ไว้ถ้าจะให้เนียน แต่นี้เอาแบบง่ายคือพุ่งตามผู้เล่นไวๆ)
+                }
+            }
+
+            // 3. บอสครู (Math): ยิงกระสุน
+            else if (e.type === 'mathBoss') {
+                if (e.actionTimer > 1.5) {
+                    e.actionTimer = 0;
+                    const angle = Math.atan2(state.player.y - e.y, state.player.x - e.x);
+                    // ยิง 3 นัด
+                    for(let k=-1; k<=1; k++) {
+                        state.bullets.push({
+                            x: e.x, y: e.y, radius: 6,
+                            vx: Math.cos(angle + k*0.3) * 200,
+                            vy: Math.sin(angle + k*0.3) * 200,
+                            damage: 15, type: 'mathBoss' // กระสุนแดง
+                        });
+                    }
+                }
+            }
+        }
+
+        if (e.hitFlash > 0) {
+          e.hitFlash -= dt;
+          if (e.hitFlash < 0) e.hitFlash = 0;
+        }
 
         if (e.type === 'ghost') {
           vx *= 0.7; vy *= 0.7;
@@ -1991,7 +2032,7 @@ function updateEffects(dt) {
         e.y += vy * dt;
 
         if (e.isBoss && e.type === 'mathBoss') {
-          e.projTimer += dt * 1000;
+          e.projTimer = (e.projTimer || 0) + dt * 1000; // แก้ให้ใช้ค่าเริ่มต้นเป็น 0
           if (e.projTimer > 1500) {
             e.projTimer = 0;
             const angle = Math.atan2(dy, dx);
@@ -2012,12 +2053,25 @@ function updateEffects(dt) {
           const b = state.bullets[j];
           if (b.type === 'mathBoss') continue;
           const d = Math.hypot(b.x - e.x, b.y - e.y);
-          if (d < e.radius + b.radius) {
+          if (d < e.radius + b.radius + 10) {
             let damage = b.damage;
+            let isCritical = Math.random() < (state.stats.luck * 0.05); // มีโอกาสติดคริ
+            if (isCritical) damage *= 2;
 
+            // Pepper: ระเบิด AoE
             const pepperLv = state.skills['pepper'] || 0;
-            if (pepperLv > 0 && Math.random() < 0.3 + 0.1 * pepperLv) {
-              e.speed *= 0.85;
+            if (b.type === 'shard' || (state.weaponType === 'chicken' && pepperLv > 0)) {
+               // สร้างวงระเบิด
+               const blastRadius = (40 + pepperLv * 20) * state.stats.area;
+               state.enemies.forEach(nearE => {
+                 if (Math.hypot(nearE.x - b.x, nearE.y - b.y) < blastRadius) {
+                   nearE.hp -= damage * 0.5;
+                   nearE.x += (nearE.x - b.x) * 0.1; // แรงระเบิดผลักออก
+                   nearE.y += (nearE.y - b.y) * 0.1;
+                 }
+               });
+               // เอฟเฟกต์ระเบิด (ใช้ death effect สีส้ม)
+               state.effects.push({x: b.x, y: b.y, r: 10, maxR: blastRadius, life:0, maxLife:0.3, colorPrefix:'rgba(251,146,60,'});
             }
 
             if (b.type === 'chicken') {
@@ -2051,30 +2105,48 @@ function updateEffects(dt) {
             }
 
             e.hp -= damage;
+            e.hitFlash = 0.1;
+            if (e.isBoss) updateBossUi();
 
             e.hitFlash = 0.09;
 
+            if (e.isBoss) updateBossUi();
+
             state.damageTexts.push({
-              x: e.x,
-              y: e.y - e.radius - 4,
+              x: e.x + (Math.random()-0.5)*10, 
+              y: e.y - e.radius - 10,
               value: Math.round(damage),
-              life: 0,
-              maxLife: 0.5
+              life: 0, maxLife: 0.6,
+              color: isCritical ? '#facc15' : '#fff' // คริสีเหลือง ปกติสีขาว
             });
+
+            if (b.pierce && b.pierce > 0) {
+              b.pierce--; // ลดจำนวนเจาะ
+              // กระสุนไม่หายไป แต่ลดดาเมจลงนิดหน่อยเพื่อให้สมดุล
+              b.damage *= 0.9; 
+            } else {
+              state.bullets.splice(j, 1); // ถ้าเจาะหมดแล้วค่อยลบ
+            }
 
             state.bullets.splice(j, 1);
             if (e.hp <= 0) {
-              // แทนที่การบวก xp/gold ทันที → ทำเป็นดรอป + เอฟ
               createDeathEffect(e);
               dropFromEnemy(e);
-
-              state.kills += 1;
-              killsLabel.textContent = state.kills.toString();
-
+              state.kills++;
+              killsLabel.textContent = state.kills;
+              const dieX = e.x;
+              const dieY = e.y;
               state.enemies.splice(i, 1);
-              if (e.isBoss) updateBossUi();
-              break;
+              if (e.isBoss) { 
+                  updateBossUi(); 
+                  // ตอนนี้ dieX, dieY มีค่าแล้ว ส่งไปได้เลย
+                  handleBossDeath(dieX, dieY); 
+              }
+              break; // มอนตายแล้ว ออกจาก loop bullet นี้
             }
+
+            if (b.pierce >= 0) break;
+            
           }
         }
 
@@ -2130,28 +2202,59 @@ function updateEffects(dt) {
       // fan (ลมเย็น) / blade damage over time
       const bladeLv = state.skills['blade'] || 0;
       if (bladeLv > 0) {
-        const radius = (45 + bladeLv * 8) * state.stats.area;
+        const radius = (50 + bladeLv * 12) * state.stats.area; // กว้างขึ้น
+        // หมุนเร็วขึ้นตามเลเวล
+        state.spinBladeAngle += dt * (3 + bladeLv); 
+        
         const px = state.player.x + Math.cos(state.spinBladeAngle) * radius;
         const py = state.player.y + Math.sin(state.spinBladeAngle) * radius;
-        const bladeR = 12 + bladeLv * 2;
+        const bladeR = 15 + bladeLv * 3; // ใบมีดใหญ่ขึ้น
+
+        // วาดเอฟเฟกต์กงจักร (แบบง่ายๆ ใส่ใน damage logic ไปเลย)
+        // (ปกติวาดใน draw() แต่อันนี้คำนวณชน)
+        
         state.enemies.forEach(e => {
           const d = Math.hypot(e.x - px, e.y - py);
           if (d < bladeR + e.radius) {
-            e.hp -= (8 + bladeLv * 4) * state.stats.might * dt;
+            // ดาเมจแรงมาก (DPS)
+            e.hp -= (30 + bladeLv * 15) * state.stats.might * dt;
+            e.hitFlash = 0.05;
+            // ผลักนิดนึง
+            e.x += (e.x - state.player.x) * 2 * dt;
+            e.y += (e.y - state.player.y) * 2 * dt;
           }
         });
       }
 
       const fanLv = state.skills['fan'] || 0;
       if (fanLv > 0) {
-        const fanR = 60 * state.stats.area + fanLv * 10;
+        const fanR = (70 + fanLv * 15) * state.stats.area;
         state.enemies.forEach(e => {
           const d = Math.hypot(e.x - state.player.x, e.y - state.player.y);
           if (d < fanR + e.radius) {
-            e.speed *= (1 - 0.3 * dt);
-            e.hp -= fanLv * 0.5 * dt;
+            // สโลว์หนักๆ
+            e.speed *= (1 - (0.3 + fanLv * 0.1) * dt); 
+            // ดาเมจต่อเนื่อง
+            e.hp -= (5 + fanLv * 5) * state.stats.might * dt;
+            
+            // Knockback (ผลักออก) - สำคัญมากสำหรับสายยืน
+            const push = (20 + fanLv * 10) * dt;
+            const angle = Math.atan2(e.y - state.player.y, e.x - state.player.x);
+            e.x += Math.cos(angle) * push;
+            e.y += Math.sin(angle) * push;
           }
         });
+      }
+
+      const bootsLv = state.skills['boots'] || 0;
+      if (bootsLv > 0) {
+         // สร้างกับดักไฟทุกๆ ระยะทาง (ข้ามไปก่อน เอาแบบชนแล้วเจ็บง่ายกว่า)
+         state.enemies.forEach(e => {
+            const d = Math.hypot(e.x - state.player.x, e.y - state.player.y);
+            if (d < state.player.radius + e.radius + 10) {
+                e.hp -= (10 + bootsLv * 10) * state.stats.might * dt;
+            }
+         });
       }
 
       // passive: แมวส้ม พลังงานแห่งความง่วง (สุ่มหลับตอนเลเวลอัปใน openLevelUp)
@@ -2162,6 +2265,97 @@ function updateEffects(dt) {
           state.baseDamage /= 1.4;
         }
       }
+
+
+
+      // === UNIQUE SKILLS UPDATE ===
+      
+      // 1. ลุงป๋อง: เรียกป้อมปืนถังขยะ (Trash Turret)
+      if (CHARACTERS[state.characterId].passive === 'trashTurret') {
+        state.passiveEffects.trashTurretTimer += dt;
+        if (state.passiveEffects.trashTurretTimer > 5) { // ทุก 5 วินาที
+          state.passiveEffects.trashTurretTimer = 0;
+          // สร้างกระสุนขยะวิ่งวนรอบตัว 3 ชิ้น
+          for(let i=0; i<3; i++) {
+             state.bullets.push({
+              x: state.player.x,
+              y: state.player.y,
+              radius: 6,
+              vx: Math.cos(i*2.09) * 150, // ยิงกระจาย 3 ทิศ
+              vy: Math.sin(i*2.09) * 150,
+              damage: state.baseDamage * 1.5,
+              type: 'stick', // ใช้รูปเดิมไปก่อน
+              life: 2 // กระสุนมีเวลาจำกัด
+            });
+          }
+        }
+      }
+
+      // 2. เจ๊หนิง: บ่อน้ำมันเดือด (Boiling Oil)
+      if (CHARACTERS[state.characterId].passive === 'boilingOil') {
+        state.passiveEffects.oilTimer += dt;
+        if (state.passiveEffects.oilTimer > 4) { // ทุก 4 วินาที
+          state.passiveEffects.oilTimer = 0;
+          state.passiveEffects.oilPuddles.push({
+            x: state.player.x,
+            y: state.player.y,
+            radius: 50 * state.stats.area,
+            life: 5, // อยู่ได้ 5 วิ
+            tickTimer: 0
+          });
+        }
+        
+        // อัปเดตบ่อน้ำมัน
+        for (let i = state.passiveEffects.oilPuddles.length - 1; i >= 0; i--) {
+          const puddle = state.passiveEffects.oilPuddles[i];
+          puddle.life -= dt;
+          puddle.tickTimer += dt;
+          
+          if (puddle.tickTimer > 0.5) { // เผาศัตรูทุก 0.5 วิ
+            puddle.tickTimer = 0;
+            state.enemies.forEach(e => {
+              if (Math.hypot(e.x - puddle.x, e.y - puddle.y) < puddle.radius) {
+                e.hp -= state.baseDamage * 0.8;
+                e.hitFlash = 0.1;
+                // สร้าง Effect ควันเล็กๆ (ถ้ามีระบบ particle)
+              }
+            });
+          }
+          if (puddle.life <= 0) state.passiveEffects.oilPuddles.splice(i, 1);
+        }
+      }
+
+      // 3. แมวส้ม: Zoomies (วิ่งชนแหลก)
+      if (CHARACTERS[state.characterId].passive === 'zoomies') {
+        if (!state.passiveEffects.zoomiesActive) {
+          state.passiveEffects.zoomiesTimer += dt;
+          if (state.passiveEffects.zoomiesTimer > 12) { // ทุก 12 วิ
+            state.passiveEffects.zoomiesActive = true;
+            state.passiveEffects.zoomiesDuration = 3; // วิ่งนาน 3 วิ
+            state.player.speed *= 2; // เพิ่มความเร็ว 2 เท่า
+            showDestinyBanner("ZOOMIES!!! แมวบ้าพลังทำงาน!");
+          }
+        } else {
+          state.passiveEffects.zoomiesDuration -= dt;
+          // ชนศัตรูตายทันทีระหว่างวิ่ง
+          state.enemies.forEach(e => {
+             const dist = Math.hypot(e.x - state.player.x, e.y - state.player.y);
+             if (dist < state.player.radius + e.radius + 20) {
+               e.hp -= 999; // ชนทีเดียวตาย
+               createDeathEffect(e); // บึ้ม
+             }
+          });
+          
+          // สร้าง Effect ภาพติดตา (Afterimage) - ทำง่ายๆด้วยการ push particle
+          
+          if (state.passiveEffects.zoomiesDuration <= 0) {
+            state.passiveEffects.zoomiesActive = false;
+            state.passiveEffects.zoomiesTimer = 0;
+            state.player.speed /= 2; // คืนความเร็ว
+          }
+        }
+      }
+
 
       // Level up
       while (state.player.xp >= state.player.xpToNext) {
@@ -2261,6 +2455,9 @@ function updateEffects(dt) {
 
 
     function drawAuxSkills() {
+      // ★ เพิ่มบรรทัดนี้: ถ้ายังไม่เลือกตัวละคร หรือเกมยังไม่เริ่ม ให้หยุดทำงานทันที
+      if (!state.characterId || !state.running) return;
+
       const bladeLv = state.skills['blade'] || 0;
       if (bladeLv > 0) {
         const radius = (45 + bladeLv * 8) * state.stats.area;
@@ -2283,6 +2480,33 @@ function updateEffects(dt) {
         ctx.arc(state.player.x, state.player.y, fanR, 0, Math.PI * 2);
         ctx.strokeStyle = 'rgba(129,140,248,0.3)';
         ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // วาดบ่อน้ำมันเจ๊หนิง (ต้องเช็ก CHARACTERS ก่อนเสมอ)
+      if (CHARACTERS[state.characterId] && CHARACTERS[state.characterId].passive === 'boilingOil') {
+        state.passiveEffects.oilPuddles.forEach(p => {
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(251, 191, 36, 0.4)';
+          ctx.fill();
+          ctx.strokeStyle = '#f59e0b';
+          ctx.lineWidth = 2;
+          ctx.setLineDash([5, 5]);
+          ctx.stroke();
+          ctx.restore();
+        });
+      }
+
+      // เอฟเฟกต์แมวส้ม Zoomies
+      if (state.passiveEffects.zoomiesActive) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(state.player.x, state.player.y, state.player.radius + 10, 0, Math.PI*2);
+        ctx.strokeStyle = `rgba(255, 0, 0, ${Math.random()})`;
+        ctx.lineWidth = 4;
         ctx.stroke();
         ctx.restore();
       }
@@ -2335,6 +2559,8 @@ function updateEffects(dt) {
           else if (e.type === 'ghost') color = '#e5e7eb';
           else if (e.isBoss && e.type === 'mathBoss') color = '#38bdf8';
           else if (e.isBoss) color = '#f97316';
+          else if (e.type === 'ratKing') color = '#57534e'; // สีเทาเข้ม
+          else if (e.type === 'butcherPig') color = '#be123c'; // สีแดงเลือดหมู
 
           ctx.save();
           ctx.beginPath();
@@ -2402,6 +2628,36 @@ function updateEffects(dt) {
 
     function draw() {
       drawBackground();
+
+      if (state.portal && state.portal.active) {
+        ctx.save();
+        ctx.translate(state.portal.x, state.portal.y);
+        ctx.rotate(state.portal.timer * 2); // หมุนวิบวับ
+        
+        // วงแหวนรอบนอก
+        ctx.beginPath();
+        ctx.arc(0, 0, state.portal.radius, 0, Math.PI * 2);
+        ctx.strokeStyle = '#a855f7'; // สีม่วง
+        ctx.lineWidth = 4;
+        ctx.setLineDash([10, 5]);
+        ctx.stroke();
+        
+        // วงใน (รูหนอน)
+        ctx.beginPath();
+        ctx.arc(0, 0, state.portal.radius * 0.7, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(168, 85, 247, 0.6)';
+        ctx.fill();
+        
+        // ข้อความ
+        ctx.rotate(-state.portal.timer * 2); // หมุนกลับเพื่อเขียนตัวหนังสือตรงๆ
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 12px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText("EXIT", 0, 4);
+        
+        ctx.restore();
+      }
+
       drawEffects();   // เอฟตัวแตก / spark
       drawItems();
       drawPlayer();
@@ -2421,6 +2677,9 @@ function updateEffects(dt) {
       goLevel.textContent = state.player.level.toString();
       goGold.textContent = Math.round(state.goldRun).toString();
       screenGameover.classList.remove('hidden');
+
+      meta.gold += Math.round(state.goldRun);
+      saveMeta();
 
       // เรียกใช้ระบบ Leaderboard
       saveScoreOnline().then(() => {
@@ -2471,7 +2730,7 @@ function updateEffects(dt) {
       state.kills = 0;
       state.goldRun = 0;
       state.spawnTimer = 0;
-      state.spawnInterval = 1300;
+      state.spawnInterval = 1500;
       state.shootTimer = 0;
       state.burstTimer = 0;
       state.bossSpawned = false;
@@ -2531,7 +2790,72 @@ function updateEffects(dt) {
       screenGameover.classList.add('hidden');
       screenMainMenu.classList.remove('hidden');
       screenCharStage.classList.add('hidden');
+      
+      // ★ รีเฟรชหน้าเมนูเพื่อให้ปุ่มซื้ออัปเดตตามเงินจริง
+      buildCharacterCards();
+      buildStageCards();
     });
+
+
+    function handleBossDeath(x, y) {
+        // ล้างบางมอนสเตอร์ที่เหลือ (ฉลองชัยชนะ)
+        state.enemies.forEach(e => {
+            if(!e.isBoss) {
+                createDeathEffect(e);
+                dropFromEnemy(e);
+            }
+        });
+        state.enemies = []; 
+
+        // ★ เสกประตูวาปออกมา
+        state.portal = {
+            x: x,
+            y: y,
+            radius: 45, // ขนาดประตู
+            active: true,
+            timer: 0
+        };
+        
+        showDestinyBanner("✨ ประตูมิติเปิดแล้ว! เข้าไปเพื่อจบด่าน!");
+        playSfx('levelup'); // เสียงแจ้งเตือน
+    }
+
+    function finishStage() {
+        state.running = false;
+        
+        // 1. ปลดล็อกด่านถัดไป
+        const currentStage = STAGES[state.stageId];
+        const nextStageId = currentStage.nextStage;
+        let msg = "ภารกิจสำเร็จ! กลับสู่ Lobby";
+
+        if (nextStageId) {
+            if (!meta.unlockedStages.includes(nextStageId)) {
+                meta.unlockedStages.push(nextStageId);
+                msg = "ยินดีด้วย! ปลดล็อกด่าน: " + STAGES[nextStageId].name;
+            }
+        } else {
+            msg = "สุดยอด! คุณเคลียร์เกมครบทุกด่านแล้ว!";
+        }
+        
+        // 2. บันทึกทองและข้อมูล
+        meta.gold += Math.round(state.goldRun);
+        saveMeta();
+        
+        // 3. แจ้งเตือนและดีดกลับหน้า Lobby
+        alert(msg);
+        
+        screenGameover.classList.add('hidden'); 
+        screenMainMenu.classList.remove('hidden');
+        screenCharStage.classList.add('hidden');
+        
+        // 4. รีเฟรชปุ่มต่างๆ
+        buildCharacterCards();
+        buildStageCards();
+        metaGoldLabel.textContent = meta.gold;
+        
+        // 5. ล้างค่าประตู
+        state.portal = null;
+    }
 
     // === LOOP ========================================================
     function loop(timestamp) {
