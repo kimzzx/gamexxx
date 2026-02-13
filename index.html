@@ -2,7 +2,8 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Glue Survivors</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
@@ -10,302 +11,401 @@
   <style>
     * {
       box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent; /* ปิดสีไฮไลท์เวลากดปุ่มในมือถือ */
+      -webkit-tap-highlight-color: transparent;
     }
     html, body {
       margin: 0;
       padding: 0;
       width: 100%;
       height: 100%;
-      overflow: hidden; /* ป้องกันการเลื่อนหน้าจอ */
     }
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      user-select: none; /* ห้ามลากคลุมดำ */
+      user-select: none;
     }
     .xp-pulse {
       box-shadow: 0 0 14px rgba(129,140,248,0.9);
     }
+
     canvas {
       display: block;
-      touch-action: none; /* สำคัญมาก: ป้องกัน browser จัดการ touch event เอง */
+      touch-action: none;
     }
+
     #fj-base {
       transition: opacity 0.15s ease;
     }
-    
-    /* Scrollbar สวยๆ */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
-    ::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
   </style>
 </head>
-<body class="bg-slate-950 text-white select-none">
-  <div id="game-root" class="relative w-full h-full overflow-hidden">
+<body class="bg-slate-950 text-white">
+  <div id="game-root" class="relative w-screen h-screen overflow-hidden">
     <canvas id="game" class="w-full h-full"></canvas>
 
-    <div class="absolute top-0 inset-x-0 p-2 flex items-start justify-between pointer-events-none z-10">
-      
-      <div class="flex flex-col gap-1.5 pointer-events-auto max-w-[50%]">
-        <div class="flex flex-col gap-1.5 px-2.5 py-2 rounded-xl bg-slate-900/80 backdrop-blur-md border border-slate-700/80 shadow-lg w-fit">
-          
+    <div class="absolute top-0 inset-x-0 p-3 flex items-start justify-between pointer-events-none text-xs">
+      <div class="flex flex-col gap-2 pointer-events-auto">
+      </div>  
+        <div class="flex flex-col gap-2
+                    px-3 py-2
+                    rounded-xl
+                    bg-slate-900/70
+                    backdrop-blur-md
+                    border border-slate-700/80
+                    shadow-lg
+                    w-fit">
+
           <div class="flex items-center gap-2">
-            <span class="text-emerald-300 text-[10px] sm:text-xs font-bold drop-shadow">HP</span>
-            <div class="w-24 sm:w-40 h-3 sm:h-4 rounded-full overflow-hidden bg-slate-950/90 border border-slate-700">
-              <div id="hp-bar" class="h-full bg-gradient-to-r from-emerald-400 via-yellow-400 to-red-500 transition-all duration-300 ease-out" style="width:100%;"></div>
+            <span class="text-emerald-300 text-xs font-semibold drop-shadow">
+              ❤️ HP
+            </span>
+
+            <div class="w-40 h-4 rounded-full overflow-hidden
+                        bg-slate-950/90
+                        border border-slate-700">
+
+              <div id="hp-bar"
+                class="h-full
+                      bg-gradient-to-r from-emerald-400 via-yellow-400 to-red-500
+                      transition-all duration-300 ease-out
+                      shadow-[0_0_10px_rgba(34,197,94,0.6)]"
+                style="width:100%;">
+              </div>
             </div>
           </div>
 
           <div class="flex items-center gap-2">
-            <span class="text-cyan-300 text-[10px] sm:text-xs font-bold drop-shadow">LV.<span id="level-label">1</span></span>
-            <div class="w-28 sm:w-44 h-2.5 sm:h-3 rounded-full overflow-hidden bg-slate-950/90 border border-indigo-600/80">
-              <div id="xp-bar" class="h-full bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-cyan-400 transition-all duration-300 ease-out" style="width:0%;"></div>
+            <span class="text-cyan-300 text-xs font-semibold drop-shadow">
+              ✨ LV <span id="level-label" class="font-bold">1</span>
+            </span>
+
+            <div class="w-44 h-3 rounded-full overflow-hidden
+                        bg-slate-950/90
+                        border border-indigo-600/80">
+
+              <div id="xp-bar"
+                class="h-full
+                      bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-cyan-400
+                      transition-all duration-300 ease-out
+                      shadow-[0_0_10px_rgba(99,102,241,0.6)]"
+                style="width:0%;">
+              </div>
             </div>
           </div>
+
         </div>
+        <div class="flex flex-wrap gap-2
+                    px-3 py-2
+                    rounded-xl
+                    bg-slate-900/70
+                    backdrop-blur-md
+                    border border-slate-700/80
+                    shadow-lg
+                    text-xs sm:text-sm
+                    text-slate-200">
 
-        <div class="flex flex-wrap gap-1.5 px-2 py-1.5 rounded-xl bg-slate-900/70 backdrop-blur-md border border-slate-700/80 text-[10px] sm:text-xs text-slate-200 w-fit">
-          <div class="flex items-center gap-1 px-1.5 py-0.5 rounded bg-cyan-500/10">
+          <div class="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-cyan-500/10">
             <span class="text-cyan-300">⏱</span>
             <span id="time-label" class="font-semibold text-cyan-300">0.0</span>
+            <span class="text-cyan-400/80">s</span>
           </div>
-          <div class="flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/10">
+
+          <div class="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-emerald-500/10">
             <span class="text-emerald-300">☠</span>
+            <span class="text-emerald-400/80">ฆ่า</span>
             <span id="kills-label" class="font-semibold text-emerald-300">0</span>
           </div>
-          <div class="flex items-center gap-1 px-1.5 py-0.5 rounded bg-yellow-500/10">
+
+          <div class="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-yellow-500/10">
             <span class="text-yellow-300">💰</span>
+            <span class="text-yellow-400/80">รอบนี้</span>
             <span id="gold-run-label" class="font-semibold text-yellow-300">0</span>
           </div>
-        </div>
-      </div>
 
-      <div class="pointer-events-auto flex flex-col items-end gap-1.5 max-w-[40%]">
-        <div class="bg-slate-900/80 border border-slate-700 rounded-xl p-1.5 w-20 sm:w-28 transition-all">
+        </div>
+
+
+      <div class="pointer-events-auto flex flex-col items-end gap-2">
+        <div class="bg-slate-900/80 border border-slate-700 rounded-xl p-2 w-28">
           <div class="flex items-center justify-between mb-1">
-            <span class="text-[9px] sm:text-[10px] text-slate-300">Map</span>
+            <span class="text-[11px] text-slate-300">Mini-map</span>
+            <span class="text-[9px] text-slate-500">Proto</span>
           </div>
-          <div class="relative w-full aspect-square bg-slate-800/80 rounded overflow-hidden" id="minimap"></div>
+          <div class="relative w-full aspect-square bg-slate-800/80 rounded-md overflow-hidden" id="minimap">
+          </div>
         </div>
 
-        <div id="destiny-banner" class="px-2 py-1 rounded-full bg-sky-500/10 border border-sky-400/40 text-[9px] sm:text-[10px] text-sky-100 hidden text-right max-w-full truncate">
-          -
+        <div id="destiny-banner"
+             class="px-3 py-1 rounded-full bg-sky-500/10 border border-sky-400/40 text-[10px] text-sky-100 hidden">
+          ดวงชะตาฟ้าลิขิต: -
         </div>
 
-        <div class="flex items-center gap-1.5 bg-slate-900/80 border border-slate-700 rounded-full px-2 py-1">
-          <span class="text-[10px] text-slate-300">🔊</span>
-          <input id="volume-slider" type="range" min="0" max="100" value="60" class="w-12 sm:w-20 h-1 bg-slate-700 rounded-lg accent-cyan-400">
+        <div class="mt-1 flex items-center gap-2 bg-slate-900/80 border border-slate-700 rounded-full px-2 py-1 text-[10px]">
+          <span class="text-slate-300">🔊</span>
+          <input id="volume-slider" type="range"
+                 min="0" max="100" value="60"
+                 class="w-24 h-1 bg-slate-700 rounded-lg accent-cyan-400">
         </div>
       </div>
-    </div>
+      </div>
 
-    <div class="absolute bottom-0 inset-x-0 pb-2 px-2 pointer-events-none z-10 flex justify-center">
-      <div class="bg-slate-900/90 border border-slate-700/60 rounded-2xl px-2 py-1.5 flex flex-col gap-1 shadow-lg max-w-full">
-        <div class="flex items-center justify-between text-slate-400 text-[9px] px-1">
-          <span>Skills</span>
-          <span>Max 6</span>
+    <div class="absolute bottom-0 inset-x-0 pb-2 px-3 pointer-events-none text-[10px]">
+      <div class="max-w-3xl mx-auto bg-slate-900/90 border border-slate-700/60 rounded-2xl px-3 py-2 flex flex-col gap-1">
+        <div class="flex items-center justify-between text-slate-300">
+          <span>อาวุธ & สกิล</span>
+          <span class="text-[9px] text-slate-500">สูงสุด 6 ช่อง</span>
         </div>
         <div id="skill-bar" class="grid grid-cols-3 sm:grid-cols-6 gap-1">
           </div>
       </div>
     </div>
+    
 
-    <div id="boss-hp-container" class="absolute top-16 inset-x-0 z-20 flex flex-col items-center justify-center pointer-events-none hidden transition-opacity duration-500">
-      <div class="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] scale-75 sm:scale-100">
-        <span class="text-xl sm:text-2xl animate-pulse">☠️</span>
-        <h1 id="boss-name" class="text-xl sm:text-2xl font-black text-red-100 tracking-widest uppercase" style="font-family: impact, sans-serif; -webkit-text-stroke: 1px #7f1d1d;">UNKNOWN BOSS</h1>
-        <span class="text-xl sm:text-2xl animate-pulse">☠️</span>
+    <div id="boss-hp-container"
+         class="absolute top-16 inset-x-0 z-50 flex flex-col items-center justify-center pointer-events-none hidden transition-opacity duration-500">
+      
+      <div class="flex items-center gap-3 mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+        <span class="text-2xl animate-pulse">☠️</span>
+        <h1 id="boss-name" 
+            class="text-2xl font-black text-red-100 tracking-widest uppercase"
+            style="font-family: impact, sans-serif; -webkit-text-stroke: 1px #7f1d1d;">
+          UNKNOWN BOSS
+        </h1>
+        <span class="text-2xl animate-pulse">☠️</span>
       </div>
-      <div class="relative w-[85%] sm:w-[60%] h-6 sm:h-8 bg-slate-950 rounded-full border-2 border-red-900/80 shadow-[0_0_30px_rgba(220,38,38,0.6)] overflow-hidden">
-        <div class="absolute inset-0 opacity-20" style="background-image: linear-gradient(45deg, #7f1d1d 25%, transparent 25%, transparent 50%, #7f1d1d 50%, #7f1d1d 75%, transparent 75%, transparent); background-size: 20px 20px;"></div>
-        <div id="boss-hp-bar" class="h-full bg-gradient-to-r from-red-800 via-red-600 to-orange-500 transition-all duration-200 ease-out relative shadow-[0_0_15px_rgba(255,100,100,0.5)]" style="width: 100%;">
+
+      <div class="relative w-[90%] max-w-2xl h-8 bg-slate-950 rounded-full border-2 border-red-900/80 shadow-[0_0_30px_rgba(220,38,38,0.6)] overflow-hidden">
+        
+        <div class="absolute inset-0 opacity-20" 
+             style="background-image: linear-gradient(45deg, #7f1d1d 25%, transparent 25%, transparent 50%, #7f1d1d 50%, #7f1d1d 75%, transparent 75%, transparent); background-size: 20px 20px;">
+        </div>
+
+        <div id="boss-hp-bar"
+             class="h-full bg-gradient-to-r from-red-800 via-red-600 to-orange-500 transition-all duration-200 ease-out relative shadow-[0_0_15px_rgba(255,100,100,0.5)]"
+             style="width: 100%;">
+             
              <div class="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/40 to-transparent"></div>
         </div>
       </div>
     </div>
 
-    <div id="fj-base" class="fixed z-50 pointer-events-none hidden w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-slate-900/50 border border-cyan-400/60 backdrop-blur-md flex items-center justify-center">
-      <div id="fj-knob" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-cyan-300/90 shadow-lg"></div>
+    <div id="fj-base"
+      class="fixed z-50 pointer-events-none hidden
+            w-28 h-28 rounded-full
+            bg-slate-900/50 border border-cyan-400/60
+            backdrop-blur-md flex items-center justify-center">
+      <div id="fj-knob"
+        class="w-12 h-12 rounded-full
+              bg-cyan-300/90 shadow-lg">
+      </div>
     </div>
 
-    <div id="screen-main-menu" class="absolute inset-0 bg-slate-950/90 backdrop-blur flex items-center justify-center z-40 p-4">
-      <div class="bg-slate-900/90 border border-slate-700/80 rounded-3xl p-6 w-full max-w-md shadow-2xl flex flex-col max-h-full overflow-y-auto">
-        <h1 class="text-3xl sm:text-4xl font-black text-center mb-2 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 italic" style="-webkit-text-stroke: 1px rgba(255,255,255,0.1);">
-          GLUE SURVIVORS
-        </h1>
-        <p class="text-xs text-slate-400 text-center mb-6">
-          เอาชีวิตรอดแบบกาวๆ ในโลกสุดเพี้ยน<br>ฟาร์มของ อัปสกิล แล้วไปตบเกรียนบอส!
+
+
+
+
+
+
+    <div id="screen-main-menu"
+         class="absolute inset-0 bg-slate-950/90 backdrop-blur flex items-center justify-center z-40">
+      <div class="bg-slate-900/90 border border-slate-700/80 rounded-3xl p-6 max-w-xl w-[92%] shadow-2xl">
+        <h1 class="text-2xl font-semibold text-center mb-2">Glue Survivors</h1>
+        <p class="text-xs text-slate-300 text-center mb-4 leading-relaxed">
+          เอาชีวิตรอดจากฝูงมอนสเตอร์สุดเพี้ยน เก็บ EXP & ทอง<br>
+          ซื้อ Power-ups ถาวรเพื่อให้รอบต่อไปโหดขึ้นเรื่อย ๆ
         </p>
 
-        <div class="flex items-center justify-center mb-4 text-sm text-yellow-300 gap-2 bg-slate-800/50 py-2 rounded-lg">
-          💰 ทองที่มี: <span id="meta-gold" class="font-bold text-lg">0</span>
+        <div class="flex items-center justify-center mb-3 text-[11px] text-yellow-300 gap-1">
+          💰 ทองถาวร: <span id="meta-gold" class="font-semibold">0</span>
         </div>
 
-        <div class="grid grid-cols-1 gap-3 text-sm mb-4">
-          <button id="btn-main-start" class="py-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-lg shadow-lg active:scale-95 transition">
-            ▶ เริ่มเกม (Start)
+        <div class="grid grid-cols-2 gap-3 text-sm mb-4">
+          <button id="btn-main-start"
+                  class="col-span-2 py-2 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-semibold transition">
+            ▶ เริ่มเกม
           </button>
-          <div class="grid grid-cols-2 gap-3">
-            <button class="py-3 bg-slate-800 border border-slate-700 rounded-xl font-bold hover:bg-slate-700 transition active:scale-95 text-slate-200">
-              🛍️ ร้านค้า
-            </button>
-            <button id="btn-main-powerups" class="py-3 bg-slate-800 border border-emerald-500/30 rounded-xl font-bold hover:bg-slate-700 transition active:scale-95 text-emerald-300">
-              ⚡ อัปเกรด
-            </button>
-          </div>
-          <button id="btnLeaderboard" class="py-3 bg-slate-800 border border-yellow-500/30 rounded-xl font-bold hover:bg-slate-700 transition active:scale-95 text-yellow-300">
-            🏆 อันดับผู้เล่น
+          <button id="btn-main-powerups"
+            class="w-full py-3 bg-slate-800 hover:bg-slate-700 border border-cyan-500/50 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-[0_0_15px_rgba(45,160,101,0.94)]">
+            Power-ups
+          </button>
+          <button id="btnLeaderboard"
+            class="w-full py-3 bg-slate-800 hover:bg-slate-700 border border-cyan-500/50 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+            🌐 LEADERBOARD
           </button>
         </div>
-        
-        <p class="text-[10px] text-slate-500 text-center mt-auto">
-          v1.0.0 • Mobile & PC Compatible
+        <p class="text-[11px] text-slate-400 text-center">
+          คอม: W A S D / ลูกศร เพื่อเดิน • มือถือ: ใช้จอยวงกลมด้านล่างซ้าย
         </p>
       </div>
     </div>
 
-    <div id="screen-powerups" class="absolute inset-0 bg-slate-950/90 backdrop-blur flex items-center justify-center z-50 hidden p-4">
-      <div class="bg-slate-900/95 border border-emerald-500/60 rounded-3xl p-5 w-full max-w-lg shadow-2xl flex flex-col max-h-[90%]">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-bold text-emerald-400">⚡ อัปเกรดถาวร</h2>
-          <button id="btn-close-powerups" class="px-3 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-xs">ปิด</button>
+    <div id="screen-powerups"
+         class="absolute inset-0 bg-slate-950/80 backdrop-blur flex items-center justify-center z-50 hidden">
+      <div class="bg-slate-900/95 border border-emerald-500/60 rounded-3xl p-5 max-w-xl w-[96%] shadow-2xl text-xs">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-lg font-semibold">อัปเกรดถาวร (Power-ups)</h2>
+          <button id="btn-close-powerups"
+                  class="text-[11px] px-2 py-1 rounded-full bg-slate-800 hover:bg-slate-700">
+            ปิด
+          </button>
         </div>
-        <div class="mb-4 text-xs text-slate-300 flex items-center gap-2 bg-slate-800 p-2 rounded-lg">
-          💰 ทองที่มี: <span id="meta-gold-2" class="font-bold text-yellow-300 text-base">0</span>
+        <div class="mb-3 text-[11px] text-slate-300 flex items-center gap-2">
+          💰 ทองถาวร: <span id="meta-gold-2" class="font-semibold text-yellow-300">0</span>
+          <span class="text-slate-500">* ทองได้จากการเล่นแต่ละรอบ</span>
         </div>
-        <div id="powerup-list" class="grid grid-cols-1 gap-2 overflow-y-auto pr-1">
+        <div id="powerup-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
           </div>
       </div>
     </div>
 
-    <div id="screen-char-stage" class="absolute inset-0 bg-slate-950/90 backdrop-blur flex items-center justify-center z-30 hidden p-2">
-      <div class="bg-slate-900/95 border border-slate-700 rounded-3xl p-4 w-full max-w-3xl shadow-2xl flex flex-col max-h-[95%]">
-        <h2 class="text-xl font-bold text-center mb-4 text-white">เตรียมตัวลุย!</h2>
+    <div id="screen-char-stage"
+         class="absolute inset-0 bg-slate-950/90 backdrop-blur flex items-center justify-center z-30 hidden">
+      <div class="bg-slate-900/95 border border-slate-700 rounded-3xl p-5 max-w-4xl w-[96%] shadow-2xl text-xs">
+        <h2 class="text-lg font-semibold text-center mb-2">เลือกตัวละคร & ด่าน</h2>
 
-        <div class="flex-1 overflow-y-auto pr-1 mb-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <h3 class="text-xs text-cyan-400 font-bold mb-2 uppercase tracking-wider">เลือกตัวละคร</h3>
-              <div class="grid grid-cols-1 gap-2" id="character-list"></div>
-            </div>
-            <div>
-              <h3 class="text-xs text-purple-400 font-bold mb-2 uppercase tracking-wider">เลือกด่าน</h3>
-              <div class="grid grid-cols-1 gap-2" id="stage-list"></div>
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <h3 class="text-[11px] text-slate-300 mb-2">ตัวละคร (Characters)</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" id="character-list">
+              </div>
+          </div>
+
+          <div>
+            <h3 class="text-[11px] text-slate-300 mb-2">ด่าน (Stages)</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" id="stage-list">
+              </div>
           </div>
         </div>
 
-        <div class="pt-3 border-t border-slate-800 flex justify-between items-center gap-3 bg-slate-900">
-          <button onclick="location.reload()" class="text-xs text-slate-500 hover:text-slate-300 underline">กลับ</button>
-          <button id="btn-start-run" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
-            🚀 ลุยเลย! (Start Run)
+        <div class="mt-4 flex flex-col sm:flex-row gap-2 justify-between items-center">
+          <div class="text-[11px] text-slate-400">
+            เลือกตัวละครและด่านให้ครบก่อน แล้วกดเริ่มเกม
+          </div>
+          <button id="btn-start-run"
+                  class="px-4 py-2 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-semibold text-xs disabled:opacity-40 disabled:cursor-not-allowed">
+            เริ่มด่าน!
           </button>
         </div>
       </div>
     </div>
 
-    <div id="screen-levelup" class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
-      <div class="bg-slate-900/95 border border-yellow-500/50 rounded-3xl p-5 w-full max-w-md shadow-2xl animate-bounce-small">
-        <h2 class="text-2xl font-black text-center mb-2 text-yellow-400 uppercase italic">Level Up!</h2>
-        <p class="text-xs text-slate-300 text-center mb-4">เลือกรางวัล 1 อย่าง</p>
-        <div id="levelup-options" class="grid grid-cols-1 gap-2 max-h-[60vh] overflow-y-auto">
+    <div id="screen-levelup"
+         class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-30 hidden">
+      <div class="bg-slate-900/95 border border-slate-700 rounded-3xl p-5 max-w-3xl w-[96%] shadow-2xl text-xs">
+        <h2 class="text-lg font-semibold text-center mb-2">เลเวลอัป! เลือกสกิล / สเตตัส</h2>
+        <p class="text-[11px] text-slate-300 text-center mb-3">
+          เลือก 1 อย่างจากตัวเลือกด้านล่าง
+        </p>
+        <div id="levelup-options" class="grid grid-cols-1 sm:grid-cols-3 gap-2">
           </div>
       </div>
     </div>
 
-    <div id="screen-gameover" class="absolute inset-0 bg-slate-950/90 backdrop-blur flex items-center justify-center z-50 hidden p-6">
-      <div class="bg-slate-900 border-2 border-red-500/50 rounded-3xl p-8 w-full max-w-sm text-center shadow-[0_0_50px_rgba(239,68,68,0.2)]">
-        <h2 class="text-3xl font-black mb-4 text-red-500 uppercase tracking-widest">Game Over</h2>
-        
-        <div class="space-y-2 mb-6 text-sm">
-          <div class="flex justify-between border-b border-slate-800 pb-1">
-            <span class="text-slate-400">เวลาที่รอด</span>
-            <span id="go-time" class="text-cyan-300 font-bold">0.0s</span>
-          </div>
-          <div class="flex justify-between border-b border-slate-800 pb-1">
-            <span class="text-slate-400">กำจัดศัตรู</span>
-            <span id="go-kills" class="text-emerald-300 font-bold">0</span>
-          </div>
-          <div class="flex justify-between border-b border-slate-800 pb-1">
-            <span class="text-slate-400">เลเวลสูงสุด</span>
-            <span id="go-level" class="text-indigo-300 font-bold">1</span>
-          </div>
-          <div class="flex justify-between border-b border-slate-800 pb-1">
-            <span class="text-slate-400">ทองที่ได้</span>
-            <span id="go-gold" class="text-yellow-300 font-bold">0</span>
-          </div>
-        </div>
-
-        <button id="btn-restart" class="w-full py-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold transition">
-          🏠 กลับสู่ Lobby
+    <div id="screen-gameover"
+         class="absolute inset-0 bg-slate-950/85 backdrop-blur flex items-center justify-center z-40 hidden">
+      <div class="bg-slate-900/95 border border-slate-700 rounded-3xl p-6 max-w-sm w-[92%] text-center shadow-2xl text-xs">
+        <h2 class="text-xl font-semibold mb-2 text-white">Game Over</h2>
+        <p class="text-slate-300 mb-2">
+          คุณรอดชีวิตไป <span id="go-time" class="text-cyan-300 font-semibold">0.0</span> วินาที<br>
+          กำจัดศัตรูได้ <span id="go-kills" class="text-emerald-300 font-semibold">0</span> ตัว<br>
+          เลเวลที่ไปถึง <span id="go-level" class="text-indigo-300 font-semibold">1</span><br>
+          ได้ทองรอบนี้ <span id="go-gold" class="text-yellow-300 font-semibold">0</span>
+        </p>
+        <button id="btn-restart"
+                class="mt-3 w-full py-2.5 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-semibold text-sm transition">
+          กลับสู่เมนูหลัก
         </button>
       </div>
     </div>
 
-    <div id="scoreboard" class="hidden fixed inset-0 bg-slate-950/95 backdrop-blur z-[60] flex items-center justify-center p-4">
-      <div class="bg-slate-900 border border-cyan-500/30 rounded-3xl p-5 w-full max-w-lg shadow-2xl flex flex-col max-h-[90%]">
-        <h2 class="text-2xl font-black text-cyan-400 mb-4 text-center italic">🏆 LEADERBOARD</h2>
-        <div class="overflow-y-auto flex-1 mb-4 border rounded-xl border-slate-800 bg-slate-950/50">
-          <table class="w-full text-left text-xs sm:text-sm">
-            <thead class="sticky top-0 bg-slate-800 text-cyan-300">
+    <div id="scoreboard" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[60] flex items-center justify-center p-4">
+      <div class="bg-slate-900 border-2 border-cyan-500 rounded-3xl p-6 w-full max-w-lg shadow-[0_0_30px_rgba(6,182,212,0.4)]">
+        <h2 class="text-2xl font-black text-cyan-400 mb-6 text-center tracking-tighter uppercase italic">🏆 Global Leaderboard 🏆</h2>
+        
+        <div class="overflow-y-auto max-h-[350px] mb-6 pr-2">
+          <table class="w-full text-left text-sm">
+            <thead class="sticky top-0 bg-slate-900 text-cyan-300 border-b border-slate-700">
               <tr>
-                <th class="py-2 px-3">Player</th>
-                <th class="py-2 px-2 text-center">Kills</th>
-                <th class="py-2 px-2 text-center">Gold</th>
-                <th class="py-2 px-2 text-center">Time</th>
+                <th class="py-2 px-2 text-xs">นักสู้</th>
+                <th class="py-2 px-2 text-center text-xs">☠ Kills</th>
+                <th class="py-2 px-2 text-center text-xs">💰 Gold</th>
+                <th class="py-2 px-2 text-center text-xs">⏱ Time</th>
               </tr>
             </thead>
-            <tbody id="scoreboardBody" class="divide-y divide-slate-800 text-slate-300"></tbody>
+            <tbody id="scoreboardBody" class="divide-y divide-slate-800 text-slate-200">
+              </tbody>
           </table>
         </div>
-        <button id="btnCloseScoreboard" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl">CLOSE</button>
+
+        <button id="btnCloseScoreboard"
+                class="w-full py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold rounded-2xl transition-all active:scale-95">
+          CLOSE
+        </button>
       </div>
     </div>
 
-    <div id="screen-auth" class="absolute inset-0 z-[100] bg-slate-950 flex items-center justify-center p-4">
-      <div class="w-full max-w-xs bg-slate-900 border border-cyan-500/50 rounded-3xl p-6 shadow-2xl">
-        <h2 id="auth-title" class="text-2xl font-black text-cyan-400 mb-6 text-center italic">LOGIN</h2>
-        <div class="space-y-3">
-          <input type="text" id="auth-username" placeholder="Display Name (ชื่อในเกม)" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm focus:border-cyan-500 outline-none">
-          <input type="email" id="auth-email" placeholder="Email" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm focus:border-cyan-500 outline-none">
-          <input type="password" id="auth-password" placeholder="Password" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white text-sm focus:border-cyan-500 outline-none">
-          <button id="btn-do-auth" class="w-full py-3 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl mt-2 shadow-lg">LOGIN</button>
-          <p class="text-center text-xs text-slate-400 mt-2">
-            <span id="auth-switch-text">ยังไม่มีไอดี?</span>
-            <button id="btn-switch-auth" class="text-cyan-400 font-bold underline ml-1">สมัครสมาชิก</button>
+    <div id="screen-auth" class="absolute inset-0 z-[100] bg-slate-950 flex items-center justify-center p-6">
+      <div class="w-full max-w-sm bg-slate-900 border-2 border-cyan-500 rounded-3xl p-8 shadow-[0_0_40px_rgba(6,182,212,0.3)]">
+        <h2 id="auth-title" class="text-3xl font-black text-cyan-400 mb-6 text-center italic uppercase">Player Login</h2>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs text-cyan-300 mb-1 ml-2">USERNAME (ชื่อที่จะโชว์ในอันดับ)</label>
+            <input type="text" id="auth-username" placeholder="ตั้งชื่อเท่ๆ ของมึง" 
+                  class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-cyan-500 transition-all text-white mb-4">
+          </div>
+          <div>
+            <label class="block text-xs text-cyan-300 mb-1 ml-2">EMAIL</label>
+            <input type="email" id="auth-email" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-cyan-500 transition-all text-white">
+          </div>
+          <div>
+            <label class="block text-xs text-cyan-300 mb-1 ml-2">PASSWORD</label>
+            <input type="password" id="auth-password" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-cyan-500 transition-all text-white">
+          </div>
+          
+          <button id="btn-do-auth" class="w-full py-4 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-2xl shadow-lg transition-all active:scale-95 mt-2">
+            LOGIN
+          </button>
+
+          <p class="text-center text-sm text-slate-400 mt-4">
+            <span id="auth-switch-text">Don't have an account?</span>
+            <button id="btn-switch-auth" class="text-cyan-400 font-bold ml-1 underline">Register</button>
           </p>
         </div>
       </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   </div>
 
   <script>
-    // === 1. JOYSTICK SYSTEM ===
+
+
+    /* ================= FLOATING JOYSTICK ================= */
     const fjBase = document.getElementById("fj-base");
     const fjKnob = document.getElementById("fj-knob");
+
     let fjActive = false;
     let fjStartX = 0;
     let fjStartY = 0;
-    const fjMaxDist = 40; 
+    const fjMaxDist = 40; // ระยะลากสูงสุด
     let fjVector = { x: 0, y: 0 };
 
     function setJoystick(x, y) {
-      // ปรับตำแหน่งให้กึ่งกลางนิ้ว
-      const offset = fjBase.offsetWidth / 2;
-      fjBase.style.left = (x - offset) + "px";
-      fjBase.style.top  = (y - offset) + "px";
+      fjBase.style.left = (x - 56) + "px";
+      fjBase.style.top  = (y - 56) + "px";
     }
 
     function updateKnob(dx, dy) {
       const dist = Math.hypot(dx, dy);
       const clamped = Math.min(dist, fjMaxDist);
       const angle = Math.atan2(dy, dx);
+
       const kx = Math.cos(angle) * clamped;
       const ky = Math.sin(angle) * clamped;
+
       fjKnob.style.transform = `translate(${kx}px, ${ky}px)`;
+
       fjVector.x = kx / fjMaxDist;
       fjVector.y = ky / fjMaxDist;
     }
@@ -316,66 +416,110 @@
       fjVector.y = 0;
     }
 
+    /* TOUCH */
     window.addEventListener("touchstart", e => {
-      // เช็กว่าไม่ได้กดปุ่ม UI (ที่มี class pointer-events-auto)
-      if(e.target.closest('button') || e.target.closest('input') || e.target.closest('.pointer-events-auto')) return;
       const t = e.touches[0];
+      // ตรวจสอบว่าไม่ได้กดปุ่ม UI
+      if(e.target.closest('button') || e.target.closest('.pointer-events-auto')) return;
+      
       fjActive = true;
       fjStartX = t.clientX;
       fjStartY = t.clientY;
+
       setJoystick(fjStartX, fjStartY);
       fjBase.classList.remove("hidden");
-    }, { passive: false }); // passive false เพื่อให้ preventDefault ได้ถ้าจำเป็น
+    }, { passive: true });
 
     window.addEventListener("touchmove", e => {
       if (!fjActive) return;
-      // e.preventDefault(); // กันเลื่อนจอ
       const t = e.touches[0];
       updateKnob(t.clientX - fjStartX, t.clientY - fjStartY);
-    }, { passive: false });
+    }, { passive: true });
 
     window.addEventListener("touchend", () => {
       fjActive = false;
       fjBase.classList.add("hidden");
       resetJoystick();
-    }, { passive: false });
+    }, { passive: true });
 
 
-    // === 2. SUPABASE & DATA ===
+
+    // === SUPABASE CONFIG (ใช้ชื่อตัวแปร db เพื่อกันการประกาศซ้ำ) ===
     const supabaseUrl = "https://fgwfvxowufopmtbhmnac.supabase.co";
     const supabaseKey = "sb_publishable_DFMfPZqCQgime6wUojvb6w_Zf8g7e8H";
     const db = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    let playerSession = { name: "Player_" + Math.floor(Math.random()*9000+1000), startTime: 0 };
+    // ตัวแปรเก็บ Stat สำหรับ Leaderboard
+    let playerSession = {
+      name: "Player_" + Math.floor(Math.random() * 8999 + 1000),
+      startTime: 0
+    };
 
-    // --- SAVE / LOAD SYSTEM ---
-    const META_KEY = 'glue_survivors_save_v1';
+    // --- LEADERBOARD FUNCTIONS ---
+    async function saveScoreOnline() {
+      const timePlayed = Math.floor(state.time);
+      const finalName = playerSession.name || "Anonymous";
 
-    function loadMeta() {
-      try {
-        const raw = localStorage.getItem(META_KEY);
-        const defaultMeta = { gold: 0, powerups: {}, unlockedCharacters: ['pong'], unlockedStages: ['garbage'] };
-        if (!raw) return defaultMeta;
-        const obj = JSON.parse(raw);
-        if (!obj.powerups) obj.powerups = {};
-        if (typeof obj.gold !== 'number') obj.gold = 0;
-        if (!Array.isArray(obj.unlockedCharacters)) obj.unlockedCharacters = ['pong'];
-        if (!Array.isArray(obj.unlockedStages)) obj.unlockedStages = ['garbage'];
-        return obj;
-      } catch (e) {
-        return { gold: 0, powerups: {}, unlockedCharacters: ['pong'], unlockedStages: ['garbage'] };
+      const { error } = await db.from("leaderboard").insert([{
+        name: finalName,
+        kills: state.kills,
+        gold: Math.round(state.goldRun),
+        time: timePlayed
+      }]);
+      if (error) console.error("Save Error:", error.message);
+    }
+
+    async function loadLeaderboard() {
+      const body = document.getElementById('scoreboardBody');
+      body.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-slate-500 italic animate-pulse">กำลังโหลดข้อมูล...</td></tr>`;
+      
+      const scoreboard = document.getElementById('scoreboard');
+      scoreboard.classList.remove('hidden');
+
+      const { data, error } = await db
+        .from("leaderboard")
+        .select("*")
+        .order("kills", { ascending: false })
+        .limit(10);
+
+      if (error) {
+        body.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-400">โหลดข้อมูลไม่สำเร็จ: ${error.message}</td></tr>`;
+        return;
       }
+
+      body.innerHTML = "";
+      data.forEach((p, i) => {
+        const isTop3 = i < 3;
+        const tr = document.createElement("tr");
+        tr.className = `hover:bg-slate-800/50 transition-colors ${isTop3 ? 'bg-cyan-500/5' : ''}`;
+        tr.innerHTML = `
+          <td class="py-3 px-2 font-medium ${isTop3 ? 'text-yellow-400' : ''}">${i+1}. ${p.name}</td>
+          <td class="py-3 px-2 text-center text-emerald-400 font-bold">${p.kills}</td>
+          <td class="py-3 px-2 text-center text-yellow-500">${p.gold}</td>
+          <td class="py-3 px-2 text-center text-cyan-300">${p.time}s</td>
+        `;
+        body.appendChild(tr);
+      });
     }
 
-    function saveMeta() {
-      localStorage.setItem(META_KEY, JSON.stringify(meta));
-      if(metaGoldLabel) metaGoldLabel.textContent = meta.gold;
-      if(metaGoldLabel2) metaGoldLabel2.textContent = meta.gold;
+    // 1. ประกาศตัวแปรปุ่ม (วางรวมกับ DOM Elements อื่นๆ)
+    const btnLeaderboard = document.getElementById('btnLeaderboard');
+    const btnCloseScoreboard = document.getElementById('btnCloseScoreboard');
+    const scoreboardScreen = document.getElementById('scoreboard');
+
+
+    async function openLeaderboard() {
+      // เรียกใช้ฟังก์ชันเดิมที่เขียนไว้แล้ว
+      loadLeaderboard();
     }
 
-    const meta = loadMeta();
+    // 3. ผูก Event กับปุ่ม
+    if(btnLeaderboard) btnLeaderboard.addEventListener('click', openLeaderboard);
+    if(btnCloseScoreboard) btnCloseScoreboard.addEventListener('click', () => {
+      scoreboardScreen.classList.add('hidden');
+    });
 
-    // --- AUTH ---
+    // --- AUTH LOGIC ---
     let isLoginMode = true;
     const screenAuth = document.getElementById('screen-auth');
     const authTitle = document.getElementById('auth-title');
@@ -385,44 +529,57 @@
     const authPassword = document.getElementById('auth-password');
     const authUsername = document.getElementById('auth-username');
 
+    // สลับโหมด Login / Register
     btnSwitchAuth.addEventListener('click', () => {
       isLoginMode = !isLoginMode;
-      authTitle.textContent = isLoginMode ? "LOGIN" : "REGISTER";
+      authTitle.textContent = isLoginMode ? "Player Login" : "Register Player";
       btnDoAuth.textContent = isLoginMode ? "LOGIN" : "REGISTER";
-      document.getElementById('auth-switch-text').textContent = isLoginMode ? "ยังไม่มีไอดี?" : "มีไอดีแล้ว?";
-      btnSwitchAuth.textContent = isLoginMode ? "สมัครสมาชิก" : "เข้าสู่ระบบ";
+      document.getElementById('auth-switch-text').textContent = isLoginMode ? "Don't have an account?" : "Already have an account?";
+      btnSwitchAuth.textContent = isLoginMode ? "Register" : "Login";
     });
 
+    // ฟังก์ชันหลักในการ Auth
     btnDoAuth.addEventListener('click', async () => {
       const email = authEmail.value;
       const password = authPassword.value;
       const username = authUsername ? authUsername.value : "";
+
       if (!email || !password) return alert("กรุณากรอกข้อมูลให้ครบ!");
-      
+
       btnDoAuth.disabled = true;
       btnDoAuth.textContent = "Processing...";
+
       let result;
       if (isLoginMode) {
         result = await db.auth.signInWithPassword({ email, password });
       } else {
-         result = await db.auth.signUp({ email, password, options: { data: { display_name: username } } });
+         result = await db.auth.signUp({ 
+          email, 
+          password,
+          options: { data: { display_name: username } } 
+        });
       }
+
       const { data, error } = result;
+
       if (error) {
         alert("Error: " + error.message);
       } else {
         if (!isLoginMode && data.user) {
-          alert("สมัครสมาชิกสำเร็จ! ลอง Login ได้เลย");
-          btnSwitchAuth.click();
+          alert("สมัครสมาชิกสำเร็จ! กรุณาเช็ก Email เพื่อยืนยัน (ถ้ามี) หรือลอง Login ได้เลย");
+          btnSwitchAuth.click(); // สลับกลับไปหน้า Login
         } else if (data.user) {
+          // Login สำเร็จ
           screenAuth.classList.add('hidden');
           playerSession.name = data.user.user_metadata.display_name || data.user.email.split('@')[0];
+          console.log("Welcome:", playerSession.name);
         }
       }
       btnDoAuth.disabled = false;
       btnDoAuth.textContent = isLoginMode ? "LOGIN" : "REGISTER";
     });
 
+    // เช็ก Session ตอนเปิดเว็บ (ถ้าเคย Login แล้วให้ข้ามหน้า Auth)
     async function checkUser() {
       const { data: { session } } = await db.auth.getSession();
       if (session) {
@@ -432,144 +589,469 @@
     }
     checkUser();
 
-    // --- LEADERBOARD ---
-    async function saveScoreOnline() {
-      const { error } = await db.from("leaderboard").insert([{
-        name: playerSession.name || "Anonymous",
-        kills: state.kills,
-        gold: Math.round(state.goldRun),
-        time: Math.floor(state.time)
-      }]);
+    async function logout() {
+      await db.auth.signOut();
+      location.reload(); // รีโหลดหน้าเว็บเพื่อกลับไปหน้า Login
     }
 
-    async function loadLeaderboard() {
-      const body = document.getElementById('scoreboardBody');
-      body.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-slate-500">Loading...</td></tr>`;
-      document.getElementById('scoreboard').classList.remove('hidden');
-      const { data, error } = await db.from("leaderboard").select("*").order("kills", { ascending: false }).limit(10);
-      if (error) return;
-      body.innerHTML = "";
-      data.forEach((p, i) => {
-        const tr = document.createElement("tr");
-        tr.className = i < 3 ? 'bg-yellow-500/10 text-yellow-200' : 'hover:bg-slate-800/50';
-        tr.innerHTML = `
-          <td class="py-2 px-3 font-medium">${i+1}. ${p.name}</td>
-          <td class="py-2 px-2 text-center text-emerald-400">${p.kills}</td>
-          <td class="py-2 px-2 text-center text-yellow-500">${p.gold}</td>
-          <td class="py-2 px-2 text-center text-cyan-300">${p.time}s</td>
-        `;
-        body.appendChild(tr);
-      });
-    }
-    
-    document.getElementById('btnLeaderboard').addEventListener('click', loadLeaderboard);
-    document.getElementById('btnCloseScoreboard').addEventListener('click', () => document.getElementById('scoreboard').classList.add('hidden'));
 
-
-    // === 3. GAME DEFINITIONS ===
-    const CHARACTERS = {
-      pong: { id: 'pong', name: 'ลุงป๋อง', desc: 'Weapon: ไม้คีบขยะ | Skill: ป้อมปืนถังขยะ', color: 'border-emerald-400/60', hp: 200, speed: 200, baseDamage: 2.5, weaponType: 'stick', passive: 'trashTurret', price: 0 },
-      ning: { id: 'ning', name: 'เจ๊หนิง', desc: 'Weapon: น่องไก่ระเบิด | Skill: บ่อน้ำมันเดือด', color: 'border-amber-400/60', hp: 120, speed: 215, baseDamage: 1.6, weaponType: 'chicken', passive: 'boilingOil', price: 20 },
-      cat:  { id: 'cat', name: 'แมวส้ม', desc: 'Weapon: ขนมรณะ | Skill: วิ่งชนแหลก (Zoomies)', color: 'border-fuchsia-400/60', hp: 100, speed: 240, baseDamage: 1.3, weaponType: 'fluff', passive: 'zoomies', price: 30 }
-    };
-
-    const STAGES = {
-      garbage:   { id: 'garbage', name: 'ทุ่งขยะสุดสยอง', desc: 'Boss: Rat King', bossType: 'ratKing', nextStage: 'market' },
-      market:    { id: 'market', name: 'ตลาดสดพลังเพี้ยน', desc: 'Boss: Butcher Pig', bossType: 'butcherPig', nextStage: 'classroom' },
-      classroom: { id: 'classroom', name: 'ห้องเรียนโกลาหล', desc: 'Boss: Math Teacher', bossType: 'mathBoss', nextStage: null }
-    };
-
-    const SKILLS = [
-      { id: 'multi', type: 'weapon', name: 'ปืนกลทะลวง', maxLevel: 5, descLv: ['+1 กระสุน +เจาะ', '+2 กระสุน', 'ยิงไวขึ้น', 'กระจาย 5 ทิศ', 'GOD MODE'] },
-      { id: 'blade', type: 'weapon', name: 'กงจักรสังหาร', maxLevel: 4, descLv: ['หมุนรอบตัว', 'รัศมีกว้าง', 'หมุนติ้วๆ', 'พื้นที่สังหาร'] },
-      { id: 'boots', type: 'passive', name: 'รองเท้าไฟ', maxLevel: 4, descLv: ['วิ่งเร็ว+ไฟ', 'ไฟแรงขึ้น', 'ลดดาเมจ', 'THE FLASH'] },
-      { id: 'pepper', type: 'weapon', name: 'ระเบิดพริกไทย', maxLevel: 4, descLv: ['ระเบิดวงกว้าง', 'สโลว์ศัตรู', 'วงใหญ่มาก', 'NUKE'] },
-      { id: 'fan', type: 'weapon', name: 'พายุเยือกแข็ง', maxLevel: 3, descLv: ['สโลว์+ดาเมจ', 'ผลักศัตรู', 'แช่แข็ง'] },
-      { id: 'burst', type: 'weapon', name: 'คลื่นพลังทำลาย', maxLevel: 3, descLv: ['ระเบิดรอบตัว', 'ยิงรัว', 'SUPER NOVA'] },
-      { id: 'might', type: 'stat', name: 'Might', maxLevel: 5, descLv: ['+10%','+20%','+30%','+50%','+100%'] },
-      { id: 'area', type: 'stat', name: 'Area', maxLevel: 5, descLv: ['+10%','+20%','+40%','+60%','GIANT'] },
-      { id: 'cooldown', type: 'stat', name: 'Cooldown', maxLevel: 5, descLv: ['-10%','-20%','-30%','-40%','MACHINE GUN'] },
-      { id: 'luck', type: 'stat', name: 'Luck', maxLevel: 5, descLv: ['L+1','L+2','L+3','L+5','GOD LUCK'] },
-      { id: 'curse', type: 'stat', name: 'Curse', maxLevel: 5, descLv: ['+Mob','+Mob','+Mob','Hell','Die'] }
-    ];
-
-    const POWER_UP_DEFS = [
-      { id: 'hpUp', name: 'Max HP', desc: '+10 HP/Lv', maxLevel: 5, baseCost: 50 },
-      { id: 'speedUp', name: 'Move Speed', desc: '+Speed/Lv', maxLevel: 5, baseCost: 50 },
-      { id: 'mightUp', name: 'Might', desc: '+Damage', maxLevel: 3, baseCost: 80 },
-      { id: 'luckUp', name: 'Luck', desc: '+Luck', maxLevel: 3, baseCost: 80 }
-    ];
-
-    const SPRITE_SOURCES = {
-      player: { pong: 'assets/characters/pong.png', ning: 'assets/characters/ning.png', cat: 'assets/characters/cat.png' },
-      stage: { garbage: 'assets/stages/garbage.png', market: 'assets/stages/market.png', classroom: 'assets/stages/classroom.png' },
-      monster: { 
-        slime: 'assets/monsters/slime.png', roach: 'assets/monsters/roach.png', chicken: 'assets/monsters/chicken.png', 
-        duck: 'assets/monsters/duck.png', ghost: 'assets/monsters/ghost.png',
-        ratKing: 'assets/monsters/rat_king.png', butcherPig: 'assets/monsters/pig_butcher.png', mathBoss: 'assets/monsters/mathBoss.png'
-      }
-    };
-
-    const SPRITES = { player: {}, stage: {}, monster: {} };
-    function loadAllSprites() {
-      for (const k in SPRITE_SOURCES.player) { let i = new Image(); i.src = SPRITE_SOURCES.player[k]; SPRITES.player[k] = i; }
-      for (const k in SPRITE_SOURCES.stage) { let i = new Image(); i.src = SPRITE_SOURCES.stage[k]; SPRITES.stage[k] = i; }
-      for (const k in SPRITE_SOURCES.monster) { let i = new Image(); i.src = SPRITE_SOURCES.monster[k]; SPRITES.monster[k] = i; }
-    }
-
-    // === 4. GAME ENGINE ===
+    // === DOM =========================================================
     const canvas = document.getElementById('game');
     const ctx = canvas.getContext('2d');
-    
-    // UI Elements
+
     const hpBar = document.getElementById('hp-bar');
     const xpBar = document.getElementById('xp-bar');
     const levelLabel = document.getElementById('level-label');
     const timeLabel = document.getElementById('time-label');
     const killsLabel = document.getElementById('kills-label');
     const goldRunLabel = document.getElementById('gold-run-label');
-    const volumeSlider = document.getElementById('volume-slider');
+    const volumeSlider = document.getElementById('volume-slider'); 
     const bossHpContainer = document.getElementById('boss-hp-container');
     const bossHpBar = document.getElementById('boss-hp-bar');
     const bossNameLabel = document.getElementById('boss-name');
-    const destinyBanner = document.getElementById('destiny-banner');
-    
-    // Screens
+
     const screenMainMenu = document.getElementById('screen-main-menu');
     const screenCharStage = document.getElementById('screen-char-stage');
     const screenLevelup = document.getElementById('screen-levelup');
     const screenGameover = document.getElementById('screen-gameover');
     const screenPowerups = document.getElementById('screen-powerups');
-    
-    // Buttons & Lists
-    const metaGoldLabel = document.getElementById('meta-gold');
-    const metaGoldLabel2 = document.getElementById('meta-gold-2');
+
+    const btnMainStart = document.getElementById('btn-main-start');
+    const btnMainPowerups = document.getElementById('btn-main-powerups');
+    const btnStartRun = document.getElementById('btn-start-run');
+    const btnRestart = document.getElementById('btn-restart');
+    const btnClosePowerups = document.getElementById('btn-close-powerups');
+
     const characterListEl = document.getElementById('character-list');
     const stageListEl = document.getElementById('stage-list');
-    const powerupListEl = document.getElementById('powerup-list');
-    const skillBarEl = document.getElementById('skill-bar');
     const levelupOptionsEl = document.getElementById('levelup-options');
+    const skillBarEl = document.getElementById('skill-bar');
     const minimapEl = document.getElementById('minimap');
+    const destinyBanner = document.getElementById('destiny-banner');
 
-    // State
-    const state = {
-      running: false, inLevelUp: false,
-      characterId: null, stageId: null,
-      player: { x: 0, y: 0, radius: 14, speed: 200, maxHp: 100, hp: 100, level: 1, xp: 0, xpToNext: 5 },
-      baseDamage: 1, weaponType: 'stick',
-      enemies: [], bullets: [], items: [], effects: [], damageTexts: [],
-      skills: {}, stats: { might: 1, area: 1, cooldown: 1, luck: 1, curse: 1 },
-      spinBladeAngle: 0,
-      time: 0, kills: 0, goldRun: 0,
-      spawnTimer: 0, spawnInterval: 1500,
-      shootTimer: 0, burstTimer: 0,
-      bossSpawned: false, portal: null,
-      destinyTimer: 0, destinyActive: null, destinyTimeLeft: 0,
-      keys: {},
-      passiveEffects: { trashTurretTimer: 0, oilPuddles: [], oilTimer: 0, zoomiesActive: false, zoomiesTimer: 0, zoomiesDuration: 0 }
+    const goTime = document.getElementById('go-time');
+    const goKills = document.getElementById('go-kills');
+    const goLevel = document.getElementById('go-level');
+    const goGold = document.getElementById('go-gold');
+
+    const metaGoldLabel = document.getElementById('meta-gold');
+    const metaGoldLabel2 = document.getElementById('meta-gold-2');
+    const powerupListEl = document.getElementById('powerup-list');
+
+
+    let playerStats = {
+      name: "Player" + Math.floor(Math.random() * 9999),
+      kills: 0,
+      gold: 0,
+      startTime: Date.now()
     };
 
-    // Resize
+    function startGame() {
+      console.log("Game Started!");
+      // โค้ดเริ่มเกมเดิมของมึง...
+    }
+
+
+
+    // === VOLUME SLIDER ==========================================
+    if (volumeSlider) {
+      volumeSlider.addEventListener('input', () => {
+        const v = volumeSlider.value / 100;
+        if (!bgm) {
+          initBgm();
+        }
+        bgm.volume = v;
+      });
+    }
+
+
+    function xpPulse() {
+      xpBar.classList.add('xp-pulse');
+      setTimeout(() => {
+        xpBar.classList.remove('xp-pulse');
+      }, 180);
+    }
+
+
+    // === META (LOCALSTORAGE) =========================================
+    const META_KEY = 'soa_meta_v2'; // เปลี่ยนเวอร์ชันเพื่อรีเซ็ตค่าเก่าที่อาจจะบัค
+
+    function loadMeta() {
+      try {
+        const raw = localStorage.getItem(META_KEY);
+        // ค่าเริ่มต้น
+        const defaultMeta = { 
+            gold: 0, 
+            powerups: {}, 
+            unlockedCharacters: ['pong'],
+            unlockedStages: ['garbage'] // เริ่มต้นปลดแค่ด่านแรก
+        };
+        
+        if (!raw) return defaultMeta;
+        
+        const obj = JSON.parse(raw);
+        if (!obj.powerups) obj.powerups = {};
+        if (typeof obj.gold !== 'number') obj.gold = 0;
+        if (!Array.isArray(obj.unlockedCharacters)) obj.unlockedCharacters = ['pong'];
+        // เช็คว่ามีข้อมูลด่านหรือยัง ถ้าไม่มีให้ใส่ด่านแรก
+        if (!Array.isArray(obj.unlockedStages)) obj.unlockedStages = ['garbage'];
+        
+        return obj;
+      } catch (e) {
+        return { gold: 0, powerups: {}, unlockedCharacters: ['pong'], unlockedStages: ['garbage'] };
+      }
+    }
+
+    function saveMeta() {
+      localStorage.setItem(META_KEY, JSON.stringify(meta));
+      // อัปเดตตัวเลขทองในหน้าเมนูทันที
+      if(metaGoldLabel) metaGoldLabel.textContent = meta.gold.toString();
+      if(metaGoldLabel2) metaGoldLabel2.textContent = meta.gold.toString();
+    }
+
+    const meta = loadMeta();
+
+    // === GAME DEFINITIONS ============================================
+    const CHARACTERS = {
+      pong: {
+        id: 'pong',
+        name: 'ลุงป๋อง เจ้าพ่อรีไซเคิล',
+        desc: 'อาวุธ: ไม้คีบขยะ | Skill: เรียกป้อมปืนถังขยะช่วยยิงอัตโนมัติ',
+        color: 'border-emerald-400/60 hover:border-emerald-300',
+        hp: 200,
+        speed: 200,
+        baseDamage: 2.5,
+        weaponType: 'stick',
+        passive: 'trashTurret',
+        price: 0
+      },
+      cat: {
+        id: 'cat',
+        name: 'น้องแมวส้มเมี้ยวบ้าพลัง',
+        desc: 'อาวุธ: ก้อนขนมรณะ | Skill: วิ่งชนศัตรูตายเกลื่อนจอทุกๆ 15 วิ',
+        color: 'border-fuchsia-400/60 hover:border-fuchsia-300',
+        hp: 100,
+        speed: 240,
+        baseDamage: 1.3,
+        weaponType: 'fluff',
+        passive: 'zoomies',
+        price: 300
+      },
+      ning: {
+        id: 'ning',
+        name: 'เจ๊หนิง ไก่ทอดนรกแตก',
+        desc: 'อาวุธ: น่องไก่ระเบิด | Skill: สาดน้ำมันเดือดเผาพื้น สร้าง Area Damage',
+        color: 'border-amber-400/60 hover:border-amber-300',
+        hp: 120,
+        speed: 215,
+        baseDamage: 1.6,
+        weaponType: 'chicken',
+        passive: 'boilingOil',
+        price: 600
+      },
+
+    };
+
+    const STAGES = {
+      garbage: {
+        id: 'garbage',
+        name: 'ทุ่งขยะสุดสยอง',
+        desc: 'Quest: กำจัด "ราชาหนูท่อ" เพื่อปลดล็อกด่านต่อไป',
+        bossType: 'ratKing', // บอสประจำด่าน
+        nextStage: 'market'  // ด่านที่จะปลดล็อก
+      },
+      market: {
+        id: 'market',
+        name: 'ตลาดสดพลังเพี้ยน',
+        desc: 'Quest: กำจัด "หมูสับปังตอ" เพื่อปลดล็อกด่านต่อไป',
+        bossType: 'butcherPig',
+        nextStage: 'classroom'
+      },
+      classroom: {
+        id: 'classroom',
+        name: 'ห้องเรียนโกลาหล',
+        desc: 'Quest: เอาชนะ "อาจารย์ใหญ่" ให้ได้!',
+        bossType: 'mathBoss',
+        nextStage: null // ด่านสุดท้าย
+      }
+    };
+
+const SKILLS = [
+      {
+        id: 'multi',
+        type: 'weapon',
+        name: 'ปืนกลทะลวง (Multi-Shot)',
+        maxLevel: 5,
+        descLv: [
+          'เพิ่มกระสุน +1 และเจาะทะลุศัตรู 1 ตัว',
+          'กระสุน +2 เจาะทะลุ 2 ตัว',
+          'ยิงเร็วขึ้น + กระสุนใหญ่ขึ้น',
+          'ยิงกระจาย 5 ทิศทาง เจาะทะลุ 3 ตัว',
+          'GOD MODE: กระสุนท่วมจอ เจาะทุกอย่าง!'
+        ]
+      },
+      {
+        id: 'blade',
+        type: 'weapon',
+        name: 'กงจักรสังหาร (Spin Blade)',
+        maxLevel: 4,
+        descLv: [
+          'เรียกกงจักรหมุนรอบตัว ดาเมจสูง',
+          'หมุนเร็วขึ้น + รัศมีกว้างขึ้น',
+          'ดาเมจแรงโคตร + หมุนติ้วๆ',
+          'พื้นที่สังหาร: ศัตรูที่เข้าใกล้จะละลายทันที'
+        ]
+      },
+      {
+        id: 'boots',
+        type: 'passive',
+        name: 'รองเท้าไฟบรรลัยกัลป์',
+        maxLevel: 4,
+        descLv: [
+          'วิ่งเร็วขึ้น + ทิ้งรอยไฟเผาศัตรู',
+          'ไฟแรงขึ้น + วิ่งเร็วขึ้นอีก',
+          'ลดดาเมจที่ได้รับ 20% + ชนศัตรูกระเด็น',
+          'THE FLASH: วิ่งชนศัตรูแตกกระเจิง'
+        ]
+      },
+      {
+        id: 'pepper',
+        type: 'weapon',
+        name: 'ระเบิดพริกไทย (Pepper Bomb)',
+        maxLevel: 4,
+        descLv: [
+          'โยนขวดพริกไทยระเบิดเป็นวงกว้าง',
+          'ระเบิดแรงขึ้น + สโลว์ศัตรู',
+          'วงระเบิดใหญ่เท่าบ้าน',
+          'NUKE: ระเบิดทีหายทั้งจอ'
+        ]
+      },
+      {
+        id: 'fan',
+        type: 'weapon',
+        name: 'พายุเยือกแข็ง (Ice Storm)',
+        maxLevel: 3,
+        descLv: [
+          'ออร่าความเย็นรอบตัว สโลว์+ดาเมจ',
+          'เพิ่มแรงผลัก (Knockback) ให้ศัตรูเข้าไม่ถึงตัว',
+          'แช่แข็งศัตรูจนตายคาที่'
+        ]
+      },
+      {
+        id: 'burst',
+        type: 'weapon',
+        name: 'คลื่นพลังทำลาย (Nova Burst)',
+        maxLevel: 3,
+        descLv: [
+          'ปล่อยคลื่นพลังรอบตัวผลักศัตรู',
+          'ยิงถี่ขึ้น + แรงขึ้น 2 เท่า',
+          'SUPER NOVA: ระเบิดพลังทำลายล้างรอบทิศ'
+        ]
+      },
+      // ... (Stats พวก might, area, cooldown, luck, curse ปล่อยไว้เหมือนเดิมได้)
+      { id: 'might', type: 'stat', name: 'Might (พลังโจมตี)', maxLevel: 5, descLv: ['+10%','+20%','+30%','+50%','+100% DAM!'] },
+      { id: 'area', type: 'stat', name: 'Area (ขนาดสกิล)', maxLevel: 5, descLv: ['+10%','+20%','+40%','+60%','GIANT SIZE!'] },
+      { id: 'cooldown', type: 'stat', name: 'Cooldown (รัว)', maxLevel: 5, descLv: ['-10%','-20%','-30%','-40%','MACHINE GUN!'] },
+      { id: 'luck', type: 'stat', name: 'Luck (ดวง)', maxLevel: 5, descLv: ['Luck+1','Luck+2','Luck+3','Luck+5','LUCKY GOD!'] },
+      { id: 'curse', type: 'stat', name: 'Curse (คำสาป)', maxLevel: 5, descLv: ['ศัตรูเยอะขึ้น','เยอะขึ้นอีก','เยอะฉิบหาย','นรกแตก','ตายซะ!'] }
+    ];
+
+    const POWER_UP_DEFS = [
+      {
+        id: 'hpUp',
+        name: 'เพิ่ม HP เริ่มต้น',
+        desc: 'เพิ่ม HP เริ่มต้น +10 ต่อเลเวล',
+        maxLevel: 5,
+        baseCost: 50
+      },
+      {
+        id: 'speedUp',
+        name: 'เพิ่มความเร็วเริ่มต้น',
+        desc: 'เพิ่มความเร็ววิ่งเริ่มต้นเล็กน้อย',
+        maxLevel: 5,
+        baseCost: 50
+      },
+      {
+        id: 'mightUp',
+        name: 'เพิ่ม Might เริ่มต้น',
+        desc: 'เริ่มต้นด้วยพลังโจมตีที่สูงขึ้น',
+        maxLevel: 3,
+        baseCost: 80
+      },
+      {
+        id: 'luckUp',
+        name: 'เพิ่ม Luck เริ่มต้น',
+        desc: 'ดวงดีตั้งแต่ต้นเกม',
+        maxLevel: 3,
+        baseCost: 80
+      }
+    ];
+    // === SPRITES ========================================================
+  const SPRITE_SOURCES = {
+    player: {
+      pong: 'assets/characters/pong.png',
+      ning: 'assets/characters/ning.png',
+      cat:  'assets/characters/cat.png'
+    },
+    stage: {
+      garbage:   'assets/stages/garbage.png',
+      market:    'assets/stages/market.png',
+      classroom: 'assets/stages/classroom.png'
+    },
+    monster: {
+      slime:    'assets/monsters/slime.png',
+      roach:    'assets/monsters/roach.png',
+      chicken:  'assets/monsters/chicken.png',
+      duck:     'assets/monsters/duck.png',
+      ghost:    'assets/monsters/ghost.png',
+      mathBoss: 'assets/monsters/mathBoss.png',
+      ratKing:    'assets/monsters/rat_king.png',
+      butcherPig: 'assets/monsters/pig_butcher.png'
+    }
+  };
+
+  const SPRITES = {
+    player: {},
+    stage: {},
+    monster: {}
+  };
+
+  // โหลดรูปทั้งหมด
+  function loadAllSprites() {
+    for (const key in SPRITE_SOURCES.player) {
+      const img = new Image();
+      img.src = SPRITE_SOURCES.player[key];
+      SPRITES.player[key] = img;
+    }
+    for (const key in SPRITE_SOURCES.stage) {
+      const img = new Image();
+      img.src = SPRITE_SOURCES.stage[key];
+      SPRITES.stage[key] = img;
+    }
+    for (const key in SPRITE_SOURCES.monster) {
+      const img = new Image();
+      img.src = SPRITE_SOURCES.monster[key];
+      SPRITES.monster[key] = img;
+    }
+  }
+
+  // === SOUND EFFECTS ==========================================
+  const SFX = {};
+
+  let bgm = null;
+
+  function initBgm() {
+    if (bgm) return;
+    // ใส่ไฟล์เพลงของมึงเองตรงนี้
+    bgm = new Audio('assets/bgm/main_theme.mp3');
+    bgm.loop = true;
+    // ใช้ค่าจาก slider ถ้ามี ไม่งั้น default = 0.6
+    const defaultVol = volumeSlider ? (volumeSlider.value / 100) : 0.6;
+    bgm.volume = defaultVol;
+  }
+
+    function playBgm() {
+    initBgm();
+    // บาง browser จะ block จนกว่าจะมี user interaction แต่เนื่องจากกด Start แล้วจะโอเค
+    bgm.play().catch(() => {});
+  }
+
+  function stopBgm() {
+    if (bgm) {
+      bgm.pause();
+    }
+  }
+
+  function loadSounds() {
+    // เสียงเลเวลอัป
+    const levelUp = new Audio('assets/sfx/levelup.mp3');
+    levelUp.volume = 0.7; // ปรับความดัง 0.0 - 1.0
+    SFX.levelup = levelUp;
+  }
+
+  function playSfx(name) {
+    const s = SFX[name];
+    if (!s) return;
+    // รีเซ็ตให้เล่นใหม่ตั้งแต่ต้น
+    try {
+      s.currentTime = 0;
+      s.play().catch(() => {});
+    } catch (e) {}
+  }
+
+
+
+    
+
+    // === STATE =======================================================
+    const state = {
+      running: false,
+      inLevelUp: false,
+
+      characterId: null,
+      stageId: null,
+
+      player: {
+        x: 0,
+        y: 0,
+        radius: 14,
+        speed: 220,
+        maxHp: 120,
+        hp: 120,
+        level: 1,
+        xp: 0,
+        xpToNext: 5
+      },
+
+      baseDamage: 1.2,
+      weaponType: 'stick',
+
+      enemies: [],
+      bullets: [],
+      items: [],
+      skills: {}, // skillId -> level
+      stats: { might: 1, area: 1, cooldown: 1, luck: 1, curse: 1 },
+
+      spinBladeAngle: 0,
+
+      time: 0,
+      kills: 0,
+      goldRun: 0,
+      lastTimestamp: 0,
+      spawnTimer: 0,
+      spawnInterval: 1500,
+      shootTimer: 0,
+      burstTimer: 0,
+      bossSpawned: false,
+      portal: null,
+
+      destinyTimer: 0,
+      destinyActive: null,
+      destinyTimeLeft: 0,
+
+      keys: {},
+      joystick: { x: 0, y: 0, active: false },
+
+      passiveEffects: {
+        // Pong
+        trashTurretTimer: 0,
+        
+        // Ning
+        oilPuddles: [], // เก็บตำแหน่งบ่อน้ำมัน {x, y, life, radius}
+        oilTimer: 0,
+
+        // Cat
+        zoomiesActive: false,
+        zoomiesTimer: 0,
+        zoomiesDuration: 0
+      },
+
+      pepperEvolved: false, // ปืนใหญ่แก๊สน้ำตาพริกไทย
+      effects: [],
+      damageTexts: []
+    };
+
+    // === CANVAS RESIZE ===============================================
     function resizeCanvas() {
       const root = document.getElementById('game-root');
       const rect = root.getBoundingClientRect();
@@ -577,580 +1059,1830 @@
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      if (!state.running && state.player.x === 0) {
+
+      // ★ ถ้ายังไม่เริ่มเกม และตำแหน่งยังเป็น (0,0) ให้เซ็ตไว้กลางจอ
+      if (!state.running && state.player.x === 0 && state.player.y === 0) {
         state.player.x = rect.width / 2;
         state.player.y = rect.height / 2;
       }
     }
+
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // Audio
-    let bgm = null;
-    const SFX = { levelup: new Audio('assets/sfx/levelup.mp3') };
-    function initBgm() {
-      if(bgm) return;
-      bgm = new Audio('assets/bgm/main_theme.mp3');
-      bgm.loop = true;
-      bgm.volume = volumeSlider.value / 100;
-    }
-    function playSfx(name) { try { SFX[name].currentTime=0; SFX[name].play().catch(()=>{}); } catch(e){} }
-    if(volumeSlider) volumeSlider.addEventListener('input', () => { if(!bgm) initBgm(); bgm.volume = volumeSlider.value/100; });
+    // === INPUT: KEYBOARD =============================================
+    window.addEventListener('keydown', (e) => {
+      state.keys[e.code] = true;
+    });
+    window.addEventListener('keyup', (e) => {
+      state.keys[e.code] = false;
+    });
 
-    // Input Keys
-    window.addEventListener('keydown', e => state.keys[e.code] = true);
-    window.addEventListener('keyup', e => state.keys[e.code] = false);
 
-    // === UI BUILDERS ===
+    // === UI: BUILD CHARACTER / STAGE / POWERUPS ======================
     function buildCharacterCards() {
       characterListEl.innerHTML = '';
+      
       for (const id in CHARACTERS) {
         const c = CHARACTERS[id];
+        // เช็กว่าตัวนี้ซื้อไปรึยัง?
         const isUnlocked = meta.unlockedCharacters.includes(id);
-        const div = document.createElement('div');
-        const bg = isUnlocked ? 'bg-slate-800' : 'bg-slate-900 grayscale opacity-60';
-        div.className = `p-3 rounded-xl border border-slate-700 ${bg} flex flex-col justify-between`;
-        div.dataset.charId = id;
+
+        const btn = document.createElement('div'); // เปลี่ยนจาก button เป็น div เพื่อคุม layout เอง
         
-        let html = `
+        // ถ้ายังไม่ซื้อ ให้การ์ดดูมืดๆ หน่อย
+        const bgClass = isUnlocked ? 'bg-slate-900/80' : 'bg-slate-950/90 grayscale-[0.5]';
+        const borderClass = isUnlocked ? c.color : 'border-slate-700';
+
+        btn.className = `char-card relative flex flex-col justify-between text-left rounded-2xl border ${bgClass} ${borderClass} px-3 py-2 transition group overflow-hidden`;
+        
+        // เนื้อหาในการ์ด
+        let htmlContent = `
           <div>
-            <div class="flex justify-between text-[10px] text-slate-400 uppercase mb-1">
-              <span>${id}</span>
-              ${!isUnlocked ? '<span class="text-yellow-500">🔒 LOCKED</span>' : ''}
+            <div class="flex justify-between items-start">
+              <div class="text-[10px] text-slate-400 mb-1 uppercase">${id}</div>
+              ${!isUnlocked ? `<div class="text-[10px] text-yellow-400 font-bold">🔒 LOCKED</div>` : ''}
             </div>
-            <div class="font-bold text-sm text-slate-200">${c.name}</div>
-            <div class="text-[10px] text-slate-400">${c.desc}</div>
+            <div class="text-[13px] font-semibold mb-1 text-slate-100">${c.name}</div>
+            <div class="text-[11px] text-slate-300 leading-snug">${c.desc}</div>
           </div>
         `;
-        
-        if(isUnlocked) {
-          html += `<button class="btn-select mt-2 w-full py-1.5 rounded bg-cyan-600 hover:bg-cyan-500 text-xs font-bold text-white">SELECT</button>`;
-        } else {
-          const afford = meta.gold >= c.price;
-          html += `<button class="btn-buy mt-2 w-full py-1.5 rounded ${afford?'bg-yellow-600 hover:bg-yellow-500':'bg-slate-700'} text-xs font-bold text-white">💰 BUY (${c.price})</button>`;
-        }
-        div.innerHTML = html;
-        characterListEl.appendChild(div);
 
-        if(isUnlocked) {
-          div.onclick = () => { selectCharacter(id); };
+        // ปุ่มด้านล่าง (เลือก หรือ ซื้อ)
+        if (isUnlocked) {
+          htmlContent += `
+            <button class="btn-select mt-2 w-full py-1.5 rounded-lg bg-slate-700 hover:bg-cyan-600 text-[11px] font-bold text-white transition">
+              SELECT
+            </button>
+          `;
         } else {
-          div.querySelector('.btn-buy').onclick = (e) => {
-            e.stopPropagation();
-            if(meta.gold >= c.price) {
-              if(confirm(`ซื้อ ${c.name}?`)) {
+            // เช็กเงินใหม่สดๆ ตอนนี้เลย
+            const currentAfford = meta.gold >= c.price;
+            htmlContent += `
+                <button class="btn-buy mt-2 w-full py-1.5 rounded-lg ${currentAfford ? 'bg-yellow-600 hover:bg-yellow-500' : 'bg-slate-800 opacity-50 cursor-not-allowed'} text-[11px] font-bold text-white transition flex items-center justify-center gap-1">
+                💰 BUY (${c.price})
+                </button>
+            `;
+        }
+
+        btn.innerHTML = htmlContent;
+        characterListEl.appendChild(btn);
+
+        // --- Event Listeners ---
+        if (isUnlocked) {
+          // Logic การเลือกตัวละคร
+          const selectBtn = btn.querySelector('.btn-select');
+          btn.addEventListener('click', () => selectCharacter(id)); // คลิกที่การ์ดก็ได้
+          selectBtn.addEventListener('click', (e) => {
+             e.stopPropagation();
+             selectCharacter(id);
+          });
+          // เก็บ ref ไว้ใส่ effect ตอนเลือก
+          btn.dataset.charId = id; 
+
+        } else {
+          // Logic การซื้อตัวละคร
+          const buyBtn = btn.querySelector('.btn-buy');
+          buyBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // ไม่ให้ bubble ไป trigger อย่างอื่น
+            
+            // เช็กเงินอีกรอบตอนกด
+            if (meta.gold >= c.price) {
+              if (confirm(`ยืนยันการซื้อ "${c.name}" ในราคา ${c.price} ทอง?`)) {
+                // หักเงิน
                 meta.gold -= c.price;
+                // ปลดล็อก
                 meta.unlockedCharacters.push(id);
+                // เซฟและรีเฟรชหน้า
                 saveMeta();
-                buildCharacterCards();
-                playSfx('levelup');
+                buildCharacterCards(); // สร้างการ์ดใหม่เพื่อเปลี่ยนปุ่มเป็น Select
+                playSfx('levelup'); // เล่นเสียงดีใจหน่อย (ถ้ามี)
               }
-            } else alert('เงินไม่พอ!');
-          };
+            } else {
+              alert("เงินไม่พอจ้า! ไปฟาร์มมาก่อนนะ");
+            }
+          });
         }
       }
+      
+      // เรียก update selection เพื่อไฮไลท์ตัวที่เลือกอยู่
       updateCharStageSelection();
     }
 
-    function selectCharacter(id) { state.characterId = id; updateCharStageSelection(); }
+    // ฟังก์ชันช่วยสำหรับการเลือก (แยกออกมาจะได้เรียกซ้ำง่ายๆ)
+    function selectCharacter(id) {
+      state.characterId = id;
+      updateCharStageSelection();
+    }
 
     function buildStageCards() {
       stageListEl.innerHTML = '';
       Object.values(STAGES).forEach(s => {
+        // เช็คว่าปลดล็อกหรือยัง
         const isUnlocked = meta.unlockedStages.includes(s.id);
-        const btn = document.createElement('div');
-        btn.className = `p-3 rounded-xl border ${isUnlocked?'border-slate-600 bg-slate-800 cursor-pointer hover:bg-slate-700':'border-slate-800 bg-slate-900 opacity-50'}`;
+
+        const btn = document.createElement('button');
+        const bgClass = isUnlocked ? 'bg-slate-900/80 hover:bg-slate-800/80' : 'bg-slate-950/60 opacity-60 cursor-not-allowed';
+        const borderClass = isUnlocked ? 'border-slate-600' : 'border-slate-800';
+
+        btn.className = `stage-card text-left rounded-2xl border ${borderClass} ${bgClass} px-3 py-2 transition relative overflow-hidden`;
         btn.dataset.stageId = s.id;
-        btn.innerHTML = `
-          <div class="text-[10px] text-slate-400 uppercase">${s.id}</div>
-          <div class="font-bold text-sm ${isUnlocked?'text-white':'text-slate-500'}">${s.name} ${!isUnlocked?'🔒':''}</div>
-          <div class="text-[10px] text-slate-400">${isUnlocked ? s.desc : 'Locked'}</div>
+
+        let html = `
+          <div class="text-[10px] text-slate-400 mb-1 uppercase">${s.id}</div>
+          <div class="text-[13px] font-semibold mb-1 flex items-center gap-2">
+            ${s.name} ${!isUnlocked ? '🔒' : ''}
+          </div>
+          <div class="text-[11px] text-slate-300 leading-snug">${isUnlocked ? s.desc : '??? (ต้องผ่านด่านก่อนหน้า)'}</div>
         `;
-        if(isUnlocked) btn.onclick = () => { state.stageId = s.id; updateCharStageSelection(); };
+        
+        btn.innerHTML = html;
+        
+        if (isUnlocked) {
+          btn.addEventListener('click', () => {
+            state.stageId = s.id;
+            updateCharStageSelection();
+          });
+        }
+        
         stageListEl.appendChild(btn);
       });
     }
 
     function updateCharStageSelection() {
-      document.querySelectorAll('#character-list > div').forEach(d => {
-        d.classList.toggle('ring-2', d.dataset.charId === state.characterId);
-        d.classList.toggle('ring-cyan-400', d.dataset.charId === state.characterId);
-      });
-      document.querySelectorAll('#stage-list > div').forEach(d => {
-        d.classList.toggle('border-cyan-400', d.dataset.stageId === state.stageId);
-        d.classList.toggle('bg-slate-700', d.dataset.stageId === state.stageId);
-      });
-      document.getElementById('btn-start-run').disabled = !(state.characterId && state.stageId);
-    }
-
-    function buildPowerupCards() {
-      powerupListEl.innerHTML = '';
-      POWER_UP_DEFS.forEach(def => {
-        const lv = meta.powerups[def.id] || 0;
-        const cost = Math.round(def.baseCost * (1 + lv * 0.8));
-        const maxed = lv >= def.maxLevel;
-        const div = document.createElement('div');
-        div.className = 'p-3 bg-slate-800 border border-slate-700 rounded-xl flex justify-between items-center';
-        div.innerHTML = `
-          <div>
-            <div class="font-bold text-emerald-300 text-sm">${def.name} <span class="text-xs text-slate-400">Lv.${lv}/${def.maxLevel}</span></div>
-            <div class="text-[10px] text-slate-400">${def.desc}</div>
-          </div>
-          <button class="px-3 py-1.5 rounded-lg text-xs font-bold ${maxed || meta.gold < cost ? 'bg-slate-700 text-slate-500':'bg-yellow-600 text-white'}">
-            ${maxed ? 'MAX' : `💰 ${cost}`}
-          </button>
-        `;
-        if(!maxed) {
-          div.querySelector('button').onclick = () => {
-            if(meta.gold >= cost) {
-              meta.gold -= cost;
-              meta.powerups[def.id] = lv + 1;
-              saveMeta();
-              buildPowerupCards();
-            }
-          };
+      document.querySelectorAll('.char-card').forEach(btn => {
+        if (btn.dataset.charId === state.characterId) {
+          btn.classList.add('ring-2', 'ring-cyan-400');
+        } else {
+          btn.classList.remove('ring-2', 'ring-cyan-400');
         }
-        powerupListEl.appendChild(div);
       });
-      metaGoldLabel.textContent = meta.gold;
-      metaGoldLabel2.textContent = meta.gold;
+      document.querySelectorAll('.stage-card').forEach(btn => {
+        if (btn.dataset.stageId === state.stageId) {
+          btn.classList.remove('border-slate-600');
+          btn.classList.add('border-cyan-400', 'bg-slate-800/90');
+        } else {
+          btn.classList.add('border-slate-600');
+          btn.classList.remove('border-cyan-400', 'bg-slate-800/90');
+        }
+      });
+
+      btnStartRun.disabled = !(state.characterId && state.stageId);
     }
 
     function updateSkillBar() {
       const ids = Object.keys(state.skills);
+      const maxSlots = 6;
       let html = '';
-      for(let i=0; i<6; i++) {
-        if(i < ids.length) {
+      for (let i = 0; i < maxSlots; i++) {
+        if (i < ids.length) {
           const id = ids[i];
-          const def = SKILLS.find(s=>s.id===id);
-          html += `<div class="bg-slate-800 border border-cyan-500/50 rounded p-1 text-center"><div class="text-[8px] sm:text-[10px] truncate text-cyan-300 font-bold">${def?def.name:id}</div><div class="text-[8px] text-slate-400">Lv.${state.skills[id]}</div></div>`;
+          const level = state.skills[id];
+          const def = SKILLS.find(s => s.id === id);
+          html += `
+            <div class="rounded-xl bg-slate-800/90 border border-cyan-500/60 px-2 py-1 flex flex-col">
+              <span class="text-[10px] font-semibold text-cyan-300 truncate">${def ? def.name : id}</span>
+              <span class="text-[10px] text-slate-300">LV ${level}</span>
+            </div>
+          `;
         } else {
-          html += `<div class="bg-slate-800/50 border border-slate-700 rounded"></div>`;
+          html += `
+            <div class="rounded-xl bg-slate-800/40 border border-slate-700/70 px-2 py-1 flex items-center justify-center text-slate-500">
+              -
+            </div>
+          `;
         }
       }
       skillBarEl.innerHTML = html;
     }
 
-    // === GAMEPLAY LOGIC ===
-    function startRun() {
-      const rect = document.getElementById('game-root').getBoundingClientRect();
-      const c = CHARACTERS[state.characterId];
-      
-      state.player.x = rect.width/2; state.player.y = rect.height/2;
-      
-      // Apply Powerups
-      const pup = meta.powerups;
-      state.player.maxHp = c.hp + (pup.hpUp||0)*10;
-      state.player.hp = state.player.maxHp;
-      state.player.speed = c.speed + (pup.speedUp||0)*8;
-      
-      state.baseDamage = c.baseDamage * (1+(pup.mightUp||0)*0.1);
-      state.weaponType = c.weaponType;
-      
-      state.player.level = 1; state.player.xp = 0; state.player.xpToNext = 5;
-      
-      state.enemies = []; state.bullets = []; state.items = []; state.skills = {};
-      state.stats = { might: 1+(pup.mightUp||0)*0.1, area: 1, cooldown: 1, luck: 1+(pup.luckUp||0)*0.1, curse: 1 };
-      
-      state.time = 0; state.kills = 0; state.goldRun = 0;
-      state.bossSpawned = false; state.portal = null;
-      state.passiveEffects.trashTreasure = (c.passive==='trashTreasure');
-      state.passiveEffects.crispyBuff = (c.passive==='crispyBuff');
-      
-      state.running = true; state.inLevelUp = false;
-      
-      screenMainMenu.classList.add('hidden');
-      screenCharStage.classList.add('hidden');
-      screenGameover.classList.add('hidden');
-      
-      if(bgm) bgm.play().catch(()=>{});
-      
-      updateHpUi(); updateXpUi();
-      updateSkillBar();
-      killsLabel.textContent = '0'; goldRunLabel.textContent = '0';
-      bossHpContainer.classList.add('hidden');
+    function buildPowerupCards() {
+      powerupListEl.innerHTML = '';
+      POWER_UP_DEFS.forEach(def => {
+        const level = meta.powerups[def.id] || 0;
+        const nextLevel = level + 1;
+        const cost = Math.round(def.baseCost * (1 + level * 0.8));
+        const maxed = level >= def.maxLevel;
+
+        const card = document.createElement('button');
+        card.className =
+          'text-left rounded-2xl border border-slate-600 bg-slate-900/90 px-3 py-2 hover:bg-slate-800/90 transition disabled:opacity-40 disabled:cursor-not-allowed';
+        card.disabled = maxed || meta.gold < cost;
+        card.innerHTML = `
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[13px] font-semibold text-emerald-300">${def.name}</span>
+            <span class="text-[10px] text-slate-400">LV ${level}/${def.maxLevel}</span>
+          </div>
+          <div class="text-[11px] text-slate-200 mb-1">${def.desc}</div>
+          <div class="text-[11px] text-yellow-300">ค่าใช้จ่าย: ${maxed ? 'เต็มระดับแล้ว' : cost + ' ทอง'}</div>
+        `;
+        card.addEventListener('click', () => {
+          if (maxed) return;
+          if (meta.gold < cost) return;
+          meta.gold -= cost;
+          meta.powerups[def.id] = nextLevel;
+          saveMeta();
+          buildPowerupCards();
+        });
+        powerupListEl.appendChild(card);
+      });
+      metaGoldLabel.textContent = meta.gold.toString();
+      metaGoldLabel2.textContent = meta.gold.toString();
     }
 
-    function updateHpUi() { hpBar.style.width = `${Math.max(0, state.player.hp/state.player.maxHp*100)}%`; }
-    function updateXpUi() { xpBar.style.width = `${Math.max(0, state.player.xp/state.player.xpToNext*100)}%`; levelLabel.textContent = state.player.level; }
+    // === HP / XP / GOLD UI ===========================================
+    function updateHpUi() {
+      const p = state.player;
+      hpBar.style.width = `${Math.max(0, Math.min(1, p.hp / p.maxHp)) * 100}%`;
+    }
 
+    function updateXpUi() {
+      const p = state.player;
+      xpBar.style.width = `${Math.max(0, Math.min(1, p.xp / p.xpToNext)) * 100}%`;
+      levelLabel.textContent = p.level.toString();
+    }
+
+    function addGold(amount) {
+      state.goldRun += amount;
+      goldRunLabel.textContent = Math.round(state.goldRun).toString();
+    }
+
+    // === ENEMY SPAWN / BOSS ==========================================
     function spawnEnemy() {
-      const rect = document.getElementById('game-root').getBoundingClientRect();
-      const side = Math.floor(Math.random()*4);
+      const root = document.getElementById('game-root');
+      const rect = root.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+
+      const side = Math.floor(Math.random() * 4);
       let x, y;
-      if(side===0){x=Math.random()*rect.width;y=-30;}
-      else if(side===1){x=rect.width+30;y=Math.random()*rect.height;}
-      else if(side===2){x=Math.random()*rect.width;y=rect.height+30;}
-      else {x=-30;y=Math.random()*rect.height;}
+      if (side === 0) { x = Math.random() * w; y = -20; }
+      else if (side === 1) { x = w + 20; y = Math.random() * h; }
+      else if (side === 2) { x = Math.random() * w; y = h + 20; }
+      else { x = -20; y = Math.random() * h; }
 
       const t = Math.random();
-      let type = 'slime', baseHp = 2 + state.time * 0.04, speed = 60, gold=1;
-      baseHp *= (1+(state.stats.curse-1)*0.5);
+      let type = 'slime';
+      let radius = 12;
+      // ลดความโหดลง
+      let baseHp = 2 + state.time * 0.04;
+      let speed = 60;
+      let xp = 1;
+      let goldValue = 1;
 
-      const st = state.stageId;
-      if(st === 'garbage') {
-        if(t<0.4) { type='slime'; speed=55; }
-        else if(t<0.7) { type='roach'; baseHp=1.2; speed=120; gold=3; }
-        else { type='chicken'; speed=130; gold=2; }
-      } else if (st === 'market') {
-        if(t<0.3) { type='duck'; speed=80; gold=2; }
-        else if(t<0.6) { type='chicken'; speed=140; gold=2; }
-        else { type='slime'; speed=70; }
-      } else {
-        if(t<0.4) { type='ghost'; speed=40; gold=2; }
-        else if(t<0.7) { type='roach'; speed=110; gold=3; }
-        else { type='duck'; speed=80; }
+      const curseFactor = 1 + (state.stats.curse - 1) * 0.5;
+      baseHp *= curseFactor;
+
+      const stage = state.stageId;
+      if (stage === 'garbage') {
+        if (t < 0.4) { type = 'slime'; speed = 55; xp = 1; goldValue = 1; }
+        else if (t < 0.7) { type = 'roach'; radius = 7; baseHp = 1.2; speed = 120; xp = 0.5; goldValue = 3; }
+        else { type = 'chicken'; radius = 13; speed = 130; xp = 2; goldValue = 2; }
+      } else if (stage === 'market') {
+        if (t < 0.3) { type = 'duck'; radius = 16; speed = 80; xp = 2; goldValue = 2; }
+        else if (t < 0.6) { type = 'chicken'; radius = 13; speed = 140; xp = 2; goldValue = 2; }
+        else { type = 'slime'; speed = 70; xp = 1; goldValue = 1; }
+      } else if (stage === 'classroom') {
+        if (t < 0.4) { type = 'ghost'; radius = 16; speed = 40; xp = 2; goldValue = 2; }
+        else if (t < 0.7) { type = 'roach'; radius = 7; speed = 110; xp = 0.5; goldValue = 3; }
+        else { type = 'duck'; radius = 16; speed = 80; xp = 2; goldValue = 2; }
       }
 
-      state.enemies.push({ x, y, radius: 12, speed, hp: baseHp, maxHp: baseHp, type, hitFlash: 0, goldValue: gold });
+      state.enemies.push({
+        x, y,
+        radius,
+        speed,
+        hp: baseHp,
+        maxHp: baseHp,
+        type,
+        isBoss: false,
+        slowTimer: 0,
+        goldValue,
+        hitFlash: 0   // ★ เพิ่มบรรทัดนี้
+      });
+
     }
 
     function spawnBoss() {
-      const rect = document.getElementById('game-root').getBoundingClientRect();
-      const cfg = STAGES[state.stageId];
-      const hp = 150 + state.time*2;
+      const root = document.getElementById('game-root');
+      const rect = root.getBoundingClientRect();
+      const w = rect.width;
       
+      // ดึงประเภทบอสมาจาก Config ของ Stage
+      const stageConfig = STAGES[state.stageId];
+      const type = stageConfig ? stageConfig.bossType : 'ratKing';
+
+      // ลดเลือดบอสลงเยอะ
+      const hpBase = 150 + state.time * 2; 
+      const curseFactor = 1 + (state.stats.curse - 1) * 0.7;
+
       state.enemies.push({
-        x: rect.width/2, y: -100, radius: 40, speed: 50,
-        hp, maxHp: hp, type: cfg.bossType, isBoss: true,
-        actionTimer: 0, state: 'idle', hitFlash: 0, goldValue: 100
+        x: w / 2,
+        y: -100, // เกิดเหนือจอ
+        radius: 40, // ★ ขยาย hitbox ให้ใหญ่ขึ้น (เดิม 32)
+        speed: 50,
+        hp: hpBase * curseFactor,
+        maxHp: hpBase * curseFactor,
+        type: type,
+        isBoss: true,
+        
+        // ตัวแปรสำหรับสกิลบอส
+        actionTimer: 0, 
+        state: 'idle', // idle, attack, dash
+        
+        goldValue: 100,
+        hitFlash: 0
       });
+
       state.bossSpawned = true;
-      bossHpContainer.classList.remove('hidden');
-      bossNameLabel.textContent = cfg.bossType.toUpperCase();
-      destinyBanner.textContent = "⚠️ BOSS WARNING!";
-      destinyBanner.classList.remove('hidden');
-      setTimeout(()=>destinyBanner.classList.add('hidden'), 3000);
+      updateBossUi();
+      
+      // ประกาศเตือน
+      showDestinyBanner("⚠️ BOSS WARNING: " + type.toUpperCase() + " ⚠️");
     }
 
-    function shoot() {
-      if(state.enemies.length===0) return;
-      let target = null, minDist = Infinity;
-      state.enemies.forEach(e=>{
-        const d = Math.hypot(e.x-state.player.x, e.y-state.player.y);
-        if(d<minDist){minDist=d; target=e;}
-      });
-      if(!target) return;
-
-      const angle = Math.atan2(target.y-state.player.y, target.x-state.player.x);
-      const multi = state.skills['multi']||0;
-      let count = 1 + multi + (multi>=4?2:0);
-      const spread = (5+multi*2)*Math.PI/180;
+    function updateBossUi() {
+      const boss = state.enemies.find(e => e.isBoss);
+      if (!boss) {
+        bossHpContainer.classList.add('hidden');
+        return;
+      }
+      bossHpContainer.classList.remove('hidden');
       
-      for(let i=0; i<count; i++) {
-        const a = angle + (i-(count-1)/2)*spread;
+      let nameShow = 'Unknown Boss';
+      if (boss.type === 'ratKing') nameShow = 'ราชาหนูท่อ (The Rat King)';
+      if (boss.type === 'butcherPig') nameShow = 'หมูสับปังตอ (The Butcher)';
+      if (boss.type === 'mathBoss') nameShow = 'อาจารย์ใหญ่ (The Headmaster)';
+
+      bossNameLabel.textContent = nameShow;
+      const ratio = boss.hp / boss.maxHp;
+      bossHpBar.style.width = `${Math.max(0, Math.min(1, ratio)) * 100}%`;
+    }
+
+    // === SHOOT / SKILLS ==============================================
+function shootMainWeapon() {
+      if (state.enemies.length === 0) return;
+      const p = state.player;
+      if (state.passiveEffects.sleepStun > 0) return;
+
+      // ค้นหาเป้าหมายที่ใกล้ที่สุด
+      let target = null;
+      let bestDist = Infinity;
+      state.enemies.forEach(e => {
+        const d = Math.hypot(e.x - p.x, e.y - p.y);
+        if (d < bestDist) { bestDist = d; target = e; }
+      });
+
+      if (!target) return;
+
+      const dx = target.x - p.x;
+      const dy = target.y - p.y;
+      let baseAngle = Math.atan2(dy, dx);
+      const baseSpeed = 400; // เร็วขึ้น
+
+      const multiLv = state.skills['multi'] || 0;
+      
+      // จำนวนกระสุนและมุมกระจาย
+      let count = 1 + multiLv; 
+      // เลเวลสูงๆ ยิงเยอะขึ้นแบบก้าวกระโดด
+      if (multiLv >= 4) count += 2; 
+      if (multiLv >= 5) count += 4;
+
+      const spread = (5 + multiLv * 2) * (Math.PI / 180); // องศากระจาย
+
+      let dmgBase = state.baseDamage * state.stats.might;
+      if (state.passiveEffects.crispyBuff && state.player.hp < state.player.maxHp * 0.5) {
+        dmgBase *= 1.5;
+      }
+
+      // คำนวณ Pierce (เจาะทะลุ)
+      let pierceCount = multiLv; 
+      if (multiLv >= 5) pierceCount += 10; // เลเวล 5 เจาะยับ
+
+      for (let i = 0; i < count; i++) {
+        // คำนวณมุมเพื่อให้กระสุนกระจายออกซ้ายขวาเท่าๆ กัน
+        const offset = (i - (count - 1) / 2) * spread;
+        const finalAngle = baseAngle + offset;
+
         state.bullets.push({
-          x: state.player.x, y: state.player.y,
-          vx: Math.cos(a)*400, vy: Math.sin(a)*400,
-          radius: 5+multi, damage: state.baseDamage*state.stats.might,
-          pierce: multi+(multi>=5?10:0), type: state.weaponType, life: 2
+          x: p.x,
+          y: p.y,
+          radius: 5 + (multiLv), // กระสุนใหญ่ขึ้นตามเลเวล
+          vx: Math.cos(finalAngle) * baseSpeed,
+          vy: Math.sin(finalAngle) * baseSpeed,
+          damage: dmgBase,
+          type: state.weaponType,
+          pierce: pierceCount, // ★ ใส่ค่าเจาะทะลุ
+          life: 2 // อายุขัยกระสุน (วินาที)
         });
       }
     }
 
-    // UPDATE
-    function update(dt) {
-      if(!state.running || state.inLevelUp) return;
-      
-      state.time += dt;
-      timeLabel.textContent = state.time.toFixed(1);
-
-      // Movement
-      let mvx=0, mvy=0;
-      if(fjActive) { mvx=fjVector.x; mvy=fjVector.y; }
-      else {
-        if(state.keys['KeyW']) mvy=-1; if(state.keys['KeyS']) mvy=1;
-        if(state.keys['KeyA']) mvx=-1; if(state.keys['KeyD']) mvx=1;
-      }
-      
-      if(mvx||mvy) {
-        const len = Math.hypot(mvx, mvy)||1;
-        state.player.x += (mvx/len)*state.player.speed*dt;
-        state.player.y += (mvy/len)*state.player.speed*dt;
-      }
-      
-      // Clamp Player
-      const r = document.getElementById('game-root').getBoundingClientRect();
-      state.player.x = Math.max(10, Math.min(r.width-10, state.player.x));
-      state.player.y = Math.max(10, Math.min(r.height-10, state.player.y));
-
-      // Spawns
-      state.spawnTimer += dt*1000;
-      if(state.spawnTimer > state.spawnInterval/state.stats.curse) {
-        state.spawnTimer=0; spawnEnemy();
-        state.spawnInterval = Math.max(400, state.spawnInterval*0.99);
-      }
-      if(!state.bossSpawned && state.time > 60) spawnBoss();
-
-      // Shoot
-      state.shootTimer += dt*1000;
-      if(state.shootTimer > 600/state.stats.cooldown) { state.shootTimer=0; shoot(); }
-
-      // Bullets Move
-      for(let i=state.bullets.length-1; i>=0; i--) {
-        const b = state.bullets[i];
-        b.x += b.vx*dt; b.y += b.vy*dt; b.life -= dt;
-        if(b.life<=0 || b.x<-50 || b.x>r.width+50 || b.y<-50 || b.y>r.height+50) state.bullets.splice(i,1);
-      }
-
-      // Enemies Logic
-      for(let i=state.enemies.length-1; i>=0; i--) {
-        const e = state.enemies[i];
-        
-        // Define dieX/Y before usage
-        const dieX = e.x; const dieY = e.y;
-
-        // Move
-        const dx = state.player.x - e.x;
-        const dy = state.player.y - e.y;
-        const dist = Math.hypot(dx, dy)||1;
-        let vx = (dx/dist)*e.speed;
-        let vy = (dy/dist)*e.speed;
-
-        // Boss AI
-        if(e.isBoss) {
-          e.actionTimer += dt;
-          if(e.type==='butcherPig' && e.state==='dashing') {
-             vx = Math.cos(e.dashAngle)*e.speed; vy = Math.sin(e.dashAngle)*e.speed;
-             if(e.actionTimer>0.5) { e.state='idle'; e.actionTimer=0; e.speed=50; }
-          } else if(e.type==='butcherPig' && e.actionTimer>4) {
-             e.state='dashing'; e.actionTimer=0; e.speed=350;
-             e.dashAngle = Math.atan2(dy, dx);
-          }
-        }
-
-        e.x += vx*dt; e.y += vy*dt;
-        if(e.hitFlash>0) e.hitFlash -= dt;
-
-        // Hit Player
-        if(dist < e.radius + 14) {
-          state.player.hp -= (e.isBoss?20:10);
-          updateHpUi();
-          if(!e.isBoss) state.enemies.splice(i,1);
-          if(state.player.hp<=0) { gameOver(); return; }
-        }
-
-        // Bullet Hit Enemy
-        for(let j=state.bullets.length-1; j>=0; j--) {
-          const b = state.bullets[j];
-          if(Math.hypot(b.x-e.x, b.y-e.y) < e.radius+b.radius+5) {
-            e.hp -= b.damage;
-            e.hitFlash = 0.1;
-            if(e.isBoss) bossHpBar.style.width = `${Math.max(0, e.hp/e.maxHp*100)}%`;
-            
-            // Damage Text
-            state.damageTexts.push({x: e.x, y: e.y-20, val: Math.round(b.damage), life: 0.5});
-
-            if(b.pierce>0) { b.pierce--; b.damage*=0.8; }
-            else state.bullets.splice(j,1);
-
-            if(e.hp<=0) {
-              state.kills++; killsLabel.textContent = state.kills;
-              state.goldRun += e.goldValue; goldRunLabel.textContent = state.goldRun;
-              // Drop XP
-              state.items.push({x: dieX, y: dieY, type: 'xp', val: e.isBoss?50:1});
-              // Death Effect
-              state.effects.push({x: dieX, y: dieY, r: 10, maxR: 30, life: 0.3});
-              
-              state.enemies.splice(i,1);
-              if(e.isBoss) {
-                bossHpContainer.classList.add('hidden');
-                // Spawn Portal
-                state.portal = { x: dieX, y: dieY, r: 40, active: true, t: 0 };
-              }
-              break;
-            }
-            if(b.pierce>=0) break;
-          }
+    function applySkillLevel(id, level) {
+      if (id === 'boots') {
+        const baseSpeed = CHARACTERS[state.characterId].speed +
+          (meta.powerups.speedUp || 0) * 8;
+        state.player.speed = baseSpeed + level * 15;
+      } else if (id === 'might') {
+        state.stats.might = 1 + level * 0.15 + (meta.powerups.mightUp || 0) * 0.1;
+      } else if (id === 'area') {
+        state.stats.area = 1 + level * 0.12;
+      } else if (id === 'cooldown') {
+        state.stats.cooldown = 1 + level * 0.18;
+      } else if (id === 'luck') {
+        state.stats.luck = 1 + level * 0.2 + (meta.powerups.luckUp || 0) * 0.1;
+      } else if (id === 'curse') {
+        state.stats.curse = 1 + level * 0.25;
+      } else if (id === 'pepper') {
+        if (level >= 4 && !state.pepperEvolved && state.time > 10 * 60) {
+          // ยุคปืนใหญ่แก๊สน้ำตาพริกไทย
+          state.pepperEvolved = true;
+          showDestinyBanner('วิวัฒนาการ: ปืนใหญ่แก๊สน้ำตาพริกไทย!');
         }
       }
-
-      // Items (XP)
-      for(let i=state.items.length-1; i>=0; i--) {
-        const it = state.items[i];
-        const dist = Math.hypot(state.player.x-it.x, state.player.y-it.y);
-        if(dist < 100) {
-          it.x += (state.player.x-it.x)*5*dt;
-          it.y += (state.player.y-it.y)*5*dt;
-        }
-        if(dist < 20) {
-          if(it.type==='xp') {
-            state.player.xp += it.val;
-            if(state.player.xp >= state.player.xpToNext) {
-              state.player.xp -= state.player.xpToNext;
-              state.player.level++;
-              state.player.xpToNext = Math.round(state.player.xpToNext*1.4);
-              playSfx('levelup');
-              openLevelUp();
-            }
-            updateXpUi();
-          }
-          state.items.splice(i,1);
-        }
-      }
-
-      // Portal Logic
-      if(state.portal && state.portal.active) {
-        state.portal.t += dt;
-        if(Math.hypot(state.player.x-state.portal.x, state.player.y-state.portal.y) < state.portal.r) {
-          finishStage();
-        }
-      }
-
-      // Clean Effects
-      for(let i=state.damageTexts.length-1; i>=0; i--) {
-        state.damageTexts[i].life -= dt; state.damageTexts[i].y -= 20*dt;
-        if(state.damageTexts[i].life<=0) state.damageTexts.splice(i,1);
-      }
-      for(let i=state.effects.length-1; i>=0; i--) {
-        state.effects[i].life -= dt;
-        if(state.effects[i].life<=0) state.effects.splice(i,1);
-      }
-    }
-
-    function draw() {
-      // BG
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(0,0,canvas.width,canvas.height);
-      const imgStage = SPRITES.stage[state.stageId];
-      if(imgStage && imgStage.complete) ctx.drawImage(imgStage, 0, 0, canvas.width, canvas.height);
-
-      // Portal
-      if(state.portal) {
-        ctx.save(); ctx.translate(state.portal.x, state.portal.y); ctx.rotate(state.portal.t*2);
-        ctx.strokeStyle='#a855f7'; ctx.lineWidth=4; ctx.setLineDash([10,5]);
-        ctx.beginPath(); ctx.arc(0,0,state.portal.r,0,Math.PI*2); ctx.stroke();
-        ctx.restore();
-        ctx.fillStyle='#fff'; ctx.font='bold 12px sans-serif'; ctx.textAlign='center';
-        ctx.fillText('EXIT', state.portal.x, state.portal.y);
-      }
-
-      // Items
-      state.items.forEach(it => {
-        ctx.fillStyle = it.type==='xp'?'#4ade80':'#facc15';
-        ctx.beginPath(); ctx.arc(it.x, it.y, 4, 0, Math.PI*2); ctx.fill();
-      });
-
-      // Player
-      const p = state.player;
-      const pImg = SPRITES.player[state.characterId];
-      if(pImg && pImg.complete) {
-        ctx.drawImage(pImg, p.x-24, p.y-24, 48, 48);
-      } else {
-        ctx.fillStyle='#22d3ee'; ctx.beginPath(); ctx.arc(p.x, p.y, 14, 0, Math.PI*2); ctx.fill();
-      }
-
-      // Enemies
-      state.enemies.forEach(e => {
-        const eImg = SPRITES.monster[e.type];
-        const sz = e.isBoss?64:32;
-        if(eImg && eImg.complete) {
-          ctx.drawImage(eImg, e.x-sz/2, e.y-sz/2, sz, sz);
-        } else {
-          ctx.fillStyle = e.isBoss?'#ef4444':'#fb7185';
-          ctx.beginPath(); ctx.arc(e.x, e.y, e.radius, 0, Math.PI*2); ctx.fill();
-        }
-        if(e.hitFlash>0) {
-          ctx.globalAlpha = e.hitFlash/0.1; ctx.fillStyle='#fff';
-          ctx.beginPath(); ctx.arc(e.x, e.y, e.radius, 0, Math.PI*2); ctx.fill();
-          ctx.globalAlpha = 1;
-        }
-      });
-
-      // Bullets
-      ctx.fillStyle='#e2e8f0';
-      state.bullets.forEach(b => {
-        ctx.beginPath(); ctx.arc(b.x, b.y, b.radius, 0, Math.PI*2); ctx.fill();
-      });
-
-      // Damage Text
-      ctx.font='bold 12px sans-serif'; ctx.fillStyle='#fff'; ctx.textAlign='center';
-      state.damageTexts.forEach(t => ctx.fillText(t.val, t.x, t.y));
-      
-      // Effects
-      state.effects.forEach(ef => {
-        ctx.strokeStyle=`rgba(255,255,255,${ef.life*3})`; ctx.lineWidth=2;
-        ctx.beginPath(); ctx.arc(ef.x, ef.y, ef.maxR-(ef.life*10), 0, Math.PI*2); ctx.stroke();
-      });
     }
 
     function openLevelUp() {
       state.inLevelUp = true;
       screenLevelup.classList.remove('hidden');
-      const pool = SKILLS.filter(s => (state.skills[s.id]||0) < s.maxLevel);
-      // Pick 3 random
-      const opts = pool.sort(()=>0.5-Math.random()).slice(0,3);
-      
+
+      const available = SKILLS.filter(s => (state.skills[s.id] || 0) < s.maxLevel);
+      if (available.length === 0) {
+        state.inLevelUp = false;
+        screenLevelup.classList.add('hidden');
+        return;
+      }
+      const shuffled = [...available].sort(() => Math.random() - 0.5);
+      const luckFactor = state.stats.luck;
+      const count = luckFactor > 1.6 ? 4 : 3;
+      const options = shuffled.slice(0, Math.min(count, shuffled.length));
+
       levelupOptionsEl.innerHTML = '';
-      opts.forEach(s => {
-        const btn = document.createElement('div');
-        const nextLv = (state.skills[s.id]||0)+1;
-        btn.className = 'p-3 bg-slate-800 border border-slate-600 rounded-xl hover:border-yellow-400 cursor-pointer';
-        btn.innerHTML = `<div class="font-bold text-yellow-300 text-sm">${s.name} <span class="text-xs text-white">LV.${nextLv}</span></div><div class="text-xs text-slate-400">${s.descLv[nextLv-1]||''}</div>`;
-        btn.onclick = () => {
-          state.skills[s.id] = nextLv;
-          if(s.type==='stat') {
-            if(s.id==='might') state.stats.might += 0.1;
-            if(s.id==='cooldown') state.stats.cooldown += 0.1;
-            if(s.id==='area') state.stats.area += 0.1;
-            if(s.id==='luck') state.stats.luck += 1;
-            if(s.id==='curse') state.stats.curse += 0.5;
-          }
+      options.forEach(def => {
+        const lv = state.skills[def.id] || 0;
+        const nextLv = lv + 1;
+        const desc = def.descLv[Math.min(def.descLv.length - 1, lv)];
+        const btn = document.createElement('button');
+        btn.className =
+          'skill-opt text-left rounded-2xl border border-slate-600 bg-slate-900/80 hover:bg-slate-800/80 hover:border-cyan-400 px-3 py-2 transition';
+        btn.dataset.skillId = def.id;
+        btn.innerHTML = `
+          <div class="text-[10px] text-slate-400 mb-1">LV ${nextLv}/${def.maxLevel}</div>
+          <div class="text-[13px] font-semibold ${def.type === 'stat' ? 'text-emerald-300' : 'text-cyan-300'} mb-1">
+            ${def.name}
+          </div>
+          <div class="text-[11px] text-slate-200">${desc}</div>
+        `;
+        btn.addEventListener('click', () => {
+          state.skills[def.id] = nextLv;
+          applySkillLevel(def.id, nextLv);
+          updateSkillBar();
           state.inLevelUp = false;
           screenLevelup.classList.add('hidden');
-          updateSkillBar();
-        };
+        });
         levelupOptionsEl.appendChild(btn);
       });
     }
 
-    function gameOver() {
-      state.running = false;
-      document.getElementById('go-time').textContent = state.time.toFixed(1)+'s';
-      document.getElementById('go-kills').textContent = state.kills;
-      document.getElementById('go-level').textContent = state.player.level;
-      document.getElementById('go-gold').textContent = Math.round(state.goldRun);
+    // === DESTINY EVENTS (ฝนปลาทู / พายุรองเท้าแตะ) ================
+    function triggerRandomDestiny() {
+      const r = Math.random();
+      if (r < 0.5) {
+        state.destinyActive = 'fishRain';
+        state.destinyTimeLeft = 8;
+        showDestinyBanner('ฝนปลาทู! ศัตรูไถลไปมา');
+      } else {
+        state.destinyActive = 'sandalStorm';
+        state.destinyTimeLeft = 6;
+        showDestinyBanner('พายุรองเท้าแตะ! รองเท้าแตะสุ่มฟาดศัตรู');
+      }
+    }
+
+    function showDestinyBanner(text) {
+      destinyBanner.textContent = 'ดวงชะตาฟ้าลิขิต: ' + text;
+      destinyBanner.classList.remove('hidden');
+      setTimeout(() => {
+        destinyBanner.classList.add('hidden');
+      }, 3000);
+    }
+
+    function destinyEffects(dt) {
+      if (!state.destinyActive) return;
+      state.destinyTimeLeft -= dt;
+      if (state.destinyTimeLeft <= 0) {
+        state.destinyActive = null;
+        return;
+      }
+
+      if (state.destinyActive === 'fishRain') {
+        // ศัตรูเคลื่อนที่แปลก ๆ
+        state.enemies.forEach((e, i) => {
+          if (i % 3 === 0) {
+            e.x += Math.sin(state.time * 3 + i) * 30 * dt;
+          }
+        });
+      } else if (state.destinyActive === 'sandalStorm') {
+        // รองเท้าแตะสุ่มตกใส่ศัตรู
+        if (Math.random() < 0.6 * dt) {
+          const root = document.getElementById('game-root');
+          const rect = root.getBoundingClientRect();
+          const x = Math.random() * rect.width;
+          const target = state.enemies[Math.floor(Math.random() * state.enemies.length)];
+          if (target) {
+            target.hp -= 10 * state.stats.might;
+          }
+        }
+      }
+    }
+
+
+    // === DROPS & EFFECTS ==========================================
+    function createDeathEffect(enemy) {
+      const isBoss = enemy.isBoss;
+
+      // กำหนดรัศมีพื้นฐานตามขนาดศัตรู
+      const baseR = enemy.radius;
+      const maxR = isBoss ? baseR * 3.2 : baseR * 2.0;
+
+      // จำนวนวงที่ระเบิดออก (บอส = หลายวง)
+      const rings = isBoss ? 3 : 1;
+
+      for (let i = 0; i < rings; i++) {
+        state.effects.push({
+          x: enemy.x,
+          y: enemy.y,
+          // รัศมีเริ่มต้น
+          r: baseR + i * 4,
+          // รัศมีปลายทาง
+          maxR: maxR + i * 12,
+          life: 0,
+          maxLife: isBoss ? 0.55 : 0.35,
+          // สี prefix ตรงกับที่ drawEffects ใช้
+          // ศัตรูปกติ = น้ำเงิน, บอส = แดงชมพู
+          colorPrefix: isBoss
+            ? 'rgba(248,113,113,'  // #fb7185
+            : 'rgba(96,165,250,'   // #60a5fa
+        });
+      }
+    }
+
+
+    function dropFromEnemy(enemy) {
+      const luck = state.stats.luck;
+      let baseXp = enemy.isBoss ? 15 : (enemy.type === 'roach' ? 0.6 : 1.2);
+      let baseGold = enemy.isBoss ? (enemy.goldValue || 30) : (enemy.goldValue || 1);
+
+      if (enemy.type === 'roach') baseGold *= 2;
+      if (Math.random() < 0.2 * (luck - 1)) baseGold *= 1.5;
+
+      const drops = [];
+
+      if (enemy.isBoss) {
+        drops.push({ type: 'expBig', xp: baseXp * 2, gold: 0 });
+        drops.push({ type: 'expBig', xp: baseXp * 1.5, gold: 0 });
+        drops.push({ type: 'chest', xp: baseXp * 2, gold: baseGold + 10 });
+      } else {
+        drops.push({ type: 'expSmall', xp: baseXp, gold: 0 });
+        if (Math.random() < 0.35) {
+          drops.push({ type: 'coin', xp: 0, gold: baseGold });
+        }
+      }
+
+      drops.forEach(d => {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 6 + Math.random() * 16;
+
+        state.items.push({
+          x: enemy.x + Math.cos(angle) * dist,
+          y: enemy.y + Math.sin(angle) * dist,
+          radius: (d.type === 'expBig' || d.type === 'chest') ? 9 : 6,
+          type: d.type,
+          xp: d.xp || 0,
+          gold: d.gold || 0,
+          vx: 0,      // ★ ไม่ต้องมีความเร็วเริ่มต้น
+          vy: 0,
+          life: 0
+        });
+      });
+    }
+    
+function updateItems(dt) {
+  const root = document.getElementById('game-root');
+  const rect = root.getBoundingClientRect();
+  const w = rect.width;
+  const h = rect.height;
+
+  for (let i = state.items.length - 1; i >= 0; i--) {
+    const it = state.items[i];
+    it.life += dt;
+
+    // ฟิสิกส์เบา ๆ
+    // it.x += it.vx * dt;
+    // it.y += it.vy * dt;
+    // it.vy += 60 * dt; // แรงโน้มถ่วง
+
+    // ถ้าออกจอมากเกินไป ลบทิ้ง
+    if (it.x < -40 || it.x > w + 40 || it.y > h + 60) {
+      state.items.splice(i, 1);
+      continue;
+    }
+
+    // แรงดึงเข้าตัวละครแบบแม่เหล็ก เมื่อเข้าใกล้
+    const dx = state.player.x - it.x;
+    const dy = state.player.y - it.y;
+    const dist = Math.hypot(dx, dy) || 1;
+    if (dist < 90) {
+      const pull = 150 * dt;
+      it.x += (dx / dist) * pull;
+      it.y += (dy / dist) * pull;
+    }
+
+    // เก็บได้
+    if (dist < state.player.radius + it.radius + 4) {
+      if (it.xp) {
+        state.player.xp += it.xp;
+      }
+      if (it.gold) {
+        addGold(it.gold);
+      }
+
+      // Passive ลุงป๋อง ขุมทรัพย์จากกองขยะ
+      if (state.passiveEffects.trashTreasure &&
+          Math.random() < 0.15 * state.stats.luck) {
+        state.player.xp += 1.5;
+      }
+
+      updateXpUi();
+      state.items.splice(i, 1);
+    }
+  }
+}
+
+function drawItems() {
+  state.items.forEach(it => {
+    ctx.save();
+    let fill = '#38bdf8';
+    if (it.type === 'expSmall') fill = '#22c55e';
+    else if (it.type === 'expBig') fill = '#4ade80';
+    else if (it.type === 'coin') fill = '#facc15';
+    else if (it.type === 'chest') fill = '#f97316';
+
+    ctx.translate(it.x, it.y);
+    ctx.rotate(it.life * 3);
+    ctx.beginPath();
+    // วาดเป็นเพชร (หมุนสี่เหลี่ยม)
+    ctx.moveTo(0, -it.radius);
+    ctx.lineTo(it.radius, 0);
+    ctx.lineTo(0, it.radius);
+    ctx.lineTo(-it.radius, 0);
+    ctx.closePath();
+    ctx.fillStyle = fill;
+    ctx.fill();
+
+    ctx.restore();
+  });
+}
+
+function updateDamageTexts(dt) {
+  for (let i = state.damageTexts.length - 1; i >= 0; i--) {
+    const t = state.damageTexts[i];
+    t.life += dt;
+    t.y -= 40 * dt; // ลอยขึ้นเรื่อย ๆ
+    if (t.life >= t.maxLife) {
+      state.damageTexts.splice(i, 1);
+    }
+  }
+}
+
+function drawDamageTexts() {
+  state.damageTexts.forEach(t => {
+    const alpha = 1 - t.life / t.maxLife;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = '#fecaca'; // ชมพูแดง ๆ
+    ctx.font = 'bold 12px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText(t.value, t.x, t.y);
+    ctx.restore();
+  });
+}
+
+
+
+function drawEffects() {
+  state.effects.forEach(ef => {
+    const t = ef.life / ef.maxLife;
+    const alpha = 1 - t;
+    const radius = ef.r + (ef.maxR - ef.r) * t;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(ef.x, ef.y, radius, 0, Math.PI * 2);
+    ctx.strokeStyle = ef.colorPrefix + alpha + ')';
+    ctx.lineWidth =  ef.maxR > 50 ? 4 : 2;
+    ctx.stroke();
+    ctx.restore();
+  });
+}
+
+
+function updateEffects(dt) {
+  for (let i = state.effects.length - 1; i >= 0; i--) {
+    const ef = state.effects[i];
+    ef.life += dt;
+    if (ef.life >= ef.maxLife) {
+      state.effects.splice(i, 1);
+    }
+  }
+}
+
+
+    // === GAME LOOP UPDATE ============================================
+    function update(dt) {
+      if (!state.running) return;
+      if (state.inLevelUp) return;
+
+      const root = document.getElementById('game-root');
+      const rect = root.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+
+      state.time += dt;
+      timeLabel.textContent = state.time.toFixed(1);
+
+      state.destinyTimer += dt;
+      if (state.destinyTimer > 30) {
+        state.destinyTimer = 0;
+        const luckBonus = state.stats.luck - 1;
+        if (Math.random() < 0.4 + luckBonus * 0.1) {
+          triggerRandomDestiny();
+        }
+      }
+
       
+      // movement
+      let mvx = 0, mvy = 0;
+
+      // เช็กค่าจาก Floating Joystick (fjVector) ที่เราเขียนไว้ด้านบน
+      if (fjActive && (fjVector.x !== 0 || fjVector.y !== 0)) {
+        mvx = fjVector.x;
+        mvy = fjVector.y;
+      } 
+      // ถ้าไม่ได้ใช้จอย ให้เช็กคีย์บอร์ด
+      else {
+        if (state.keys['KeyW'] || state.keys['ArrowUp']) mvy -= 1;
+        if (state.keys['KeyS'] || state.keys['ArrowDown']) mvy += 1;
+        if (state.keys['KeyA'] || state.keys['ArrowLeft']) mvx -= 1;
+        if (state.keys['KeyD'] || state.keys['ArrowRight']) mvx += 1;
+      }
+
+      if (state.passiveEffects.sleepStun > 0) {
+        mvx = 0; mvy = 0;
+        state.passiveEffects.sleepStun -= dt;
+      }
+
+      if (mvx !== 0 || mvy !== 0) {
+        const len = Math.hypot(mvx, mvy) || 1;
+        mvx /= len;
+        mvy /= len;
+        state.player.x += mvx * state.player.speed * dt;
+        state.player.y += mvy * state.player.speed * dt;
+      }
+
+      const r = state.player.radius;
+      state.player.x = Math.max(r, Math.min(w - r, state.player.x));
+      state.player.y = Math.max(r, Math.min(h - r, state.player.y));
+
+      // shooting (cooldown based on stats.cooldown)
+      state.shootTimer += dt * 1000;
+      const shootInterval = 600 / state.stats.cooldown;
+      if (state.shootTimer > shootInterval) {
+        state.shootTimer = 0;
+        shootMainWeapon();
+      }
+
+      // burst skill
+      const burstLv = state.skills['burst'] || 0;
+      if (burstLv > 0) {
+        state.burstTimer += dt * 1000;
+        // คูลดาวน์ไวขึ้น
+        const interval = Math.max(500, 3000 - (burstLv * 600)) / state.stats.cooldown;
+        
+        if (state.burstTimer > interval) {
+          state.burstTimer = 0;
+          const count = 12 + burstLv * 4; // ยิงเยอะขึ้น (12, 16, 20 นัด)
+          
+          // เล่นเสียงยิง (ถ้ามี)
+          // playSfx('shoot'); 
+
+          for (let i = 0; i < count; i++) {
+            const a = (Math.PI * 2 * i) / count;
+            state.bullets.push({
+              x: state.player.x,
+              y: state.player.y,
+              radius: 4 + burstLv, // ลูกใหญ่ขึ้น
+              vx: Math.cos(a) * 350,
+              vy: Math.sin(a) * 350,
+              damage: state.baseDamage * 2 * state.stats.might, // แรงกว่ากระสุนปกติ 2 เท่า
+              type: 'burst',
+              pierce: 100 // เจาะทะลุหมด!
+            });
+          }
+        }
+      }
+
+      // spin blade
+      if ((state.skills['blade'] || 0) > 0) {
+        state.spinBladeAngle += dt * 4;
+      }
+
+      // spawn enemies (affected by Curse)
+      state.spawnTimer += dt * 1000;
+      const curseSpawnFactor = state.stats.curse;
+      if (state.spawnTimer > state.spawnInterval / curseSpawnFactor) {
+        state.spawnTimer = 0;
+        spawnEnemy();
+        state.spawnInterval = Math.max(450, state.spawnInterval * 0.99);
+      }
+
+      // spawn boss around 60s
+      if (!state.bossSpawned && state.time > 60) {
+        spawnBoss();
+      }
+
+      // bullets move
+      for (let i = state.bullets.length - 1; i >= 0; i--) {
+        const b = state.bullets[i];
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
+        if (b.x < -40 || b.x > w + 40 || b.y < -40 || b.y > h + 40) {
+          state.bullets.splice(i, 1);
+        }
+      }
+
+      // destiny effects
+      destinyEffects(dt);
+
+      // === PORTAL LOGIC ===
+      if (state.portal && state.portal.active) {
+          state.portal.timer += dt;
+          
+          // เช็คการชน (Player vs Portal)
+          const dist = Math.hypot(state.player.x - state.portal.x, state.player.y - state.portal.y);
+          if (dist < state.player.radius + state.portal.radius - 15) {
+              finishStage(); // เข้าประตูแล้วจบเกม!
+          }
+      }
+
+      // enemies move & collisions
+      for (let i = state.enemies.length - 1; i >= 0; i--) {
+        const e = state.enemies[i];
+
+        const dx = state.player.x - e.x;
+        const dy = state.player.y - e.y;
+        const dist = Math.hypot(dx, dy) || 1;
+        let vx = (dx / dist) * e.speed;
+        let vy = (dy / dist) * e.speed;
+
+        // --- BOSS AI LOGIC ---
+        if (e.isBoss) {
+            e.actionTimer += dt;
+
+            // 1. บอสหนู (Rat King): เรียกลูกน้องทุก 5 วิ
+            if (e.type === 'ratKing') {
+                if (e.actionTimer > 5) {
+                    e.actionTimer = 0;
+                    // เรียกลูกน้อง 3 ตัว
+                    for(let k=0; k<3; k++) {
+                        state.enemies.push({
+                            x: e.x + (Math.random()-0.5)*100,
+                            y: e.y + (Math.random()-0.5)*100,
+                            radius: 8, speed: 140, hp: 10, maxHp: 10,
+                            type: 'roach', goldValue: 1, hitFlash: 0
+                        });
+                    }
+                }
+            }
+            
+            // 2. บอสหมู (Butcher): พุ่งชน (Dash) ทุก 4 วิ
+            else if (e.type === 'butcherPig') {
+                if (e.state === 'dashing') {
+                    // กำลังพุ่ง
+                    if (e.actionTimer > 0.5) { // พุ่งเสร็จ
+                        e.state = 'idle';
+                        e.actionTimer = 0;
+                        e.speed = 40; // กลับความเร็วเดิม
+                    }
+                } else {
+                    // รอพุ่ง
+                    if (e.actionTimer > 4) {
+                        e.state = 'dashing';
+                        e.actionTimer = 0;
+                        e.speed = 350; // ความเร็วตอนพุ่ง
+                        // พุ่งไปหาผู้เล่น
+                        const angle = Math.atan2(state.player.y - e.y, state.player.x - e.x);
+                        vx = Math.cos(angle) * e.speed;
+                        vy = Math.sin(angle) * e.speed;
+                    }
+                }
+                
+                // Override velocity ถ้ากำลังพุ่ง (เพื่อให้พุ่งตรงๆ ไม่เลี้ยวตาม)
+                if (e.state === 'dashing') {
+                   // ให้มันพุ่งทิศเดิม (ต้องเก็บ vector ไว้ถ้าจะให้เนียน แต่นี้เอาแบบง่ายคือพุ่งตามผู้เล่นไวๆ)
+                }
+            }
+
+            // 3. บอสครู (Math): ยิงกระสุน
+            else if (e.type === 'mathBoss') {
+                if (e.actionTimer > 1.5) {
+                    e.actionTimer = 0;
+                    const angle = Math.atan2(state.player.y - e.y, state.player.x - e.x);
+                    // ยิง 3 นัด
+                    for(let k=-1; k<=1; k++) {
+                        state.bullets.push({
+                            x: e.x, y: e.y, radius: 6,
+                            vx: Math.cos(angle + k*0.3) * 200,
+                            vy: Math.sin(angle + k*0.3) * 200,
+                            damage: 15, type: 'mathBoss' // กระสุนแดง
+                        });
+                    }
+                }
+            }
+        }
+
+        if (e.hitFlash > 0) {
+          e.hitFlash -= dt;
+          if (e.hitFlash < 0) e.hitFlash = 0;
+        }
+
+        if (e.type === 'ghost') {
+          vx *= 0.7; vy *= 0.7;
+        }
+        if (e.type === 'duck') {
+          const angleOffset = Math.sin(state.time * 2 + i) * 0.4;
+          const baseAngle = Math.atan2(dy, dx) + angleOffset;
+          vx = Math.cos(baseAngle) * e.speed;
+          vy = Math.sin(baseAngle) * e.speed;
+        }
+        if (state.destinyActive === 'fishRain') {
+          vy += 20;
+        }
+
+        e.x += vx * dt;
+        e.y += vy * dt;
+
+        if (e.isBoss && e.type === 'mathBoss') {
+          e.projTimer = (e.projTimer || 0) + dt * 1000; // แก้ให้ใช้ค่าเริ่มต้นเป็น 0
+          if (e.projTimer > 1500) {
+            e.projTimer = 0;
+            const angle = Math.atan2(dy, dx);
+            state.bullets.push({
+              x: e.x,
+              y: e.y,
+              radius: 5,
+              vx: Math.cos(angle) * 190,
+              vy: Math.sin(angle) * 190,
+              damage: 20,
+              type: 'mathBoss'
+            });
+          }
+        }
+
+        // bullets hit enemy
+        for (let j = state.bullets.length - 1; j >= 0; j--) {
+          const b = state.bullets[j];
+          if (b.type === 'mathBoss') continue;
+          const d = Math.hypot(b.x - e.x, b.y - e.y);
+          if (d < e.radius + b.radius + 10) {
+            let damage = b.damage;
+            let isCritical = Math.random() < (state.stats.luck * 0.05); // มีโอกาสติดคริ
+            if (isCritical) damage *= 2;
+
+            // Pepper: ระเบิด AoE
+            const pepperLv = state.skills['pepper'] || 0;
+            if (b.type === 'shard' || (state.weaponType === 'chicken' && pepperLv > 0)) {
+               // สร้างวงระเบิด
+               const blastRadius = (40 + pepperLv * 20) * state.stats.area;
+               state.enemies.forEach(nearE => {
+                 if (Math.hypot(nearE.x - b.x, nearE.y - b.y) < blastRadius) {
+                   nearE.hp -= damage * 0.5;
+                   nearE.x += (nearE.x - b.x) * 0.1; // แรงระเบิดผลักออก
+                   nearE.y += (nearE.y - b.y) * 0.1;
+                 }
+               });
+               // เอฟเฟกต์ระเบิด (ใช้ death effect สีส้ม)
+               state.effects.push({x: b.x, y: b.y, r: 10, maxR: blastRadius, life:0, maxLife:0.3, colorPrefix:'rgba(251,146,60,'});
+            }
+
+            if (b.type === 'chicken') {
+              damage *= 0.9;
+              const pieces = 3;
+              for (let k = 0; k < pieces; k++) {
+                const a = Math.random() * Math.PI * 2;
+                state.bullets.push({
+                  x: e.x,
+                  y: e.y,
+                  radius: 3,
+                  vx: Math.cos(a) * 200,
+                  vy: Math.sin(a) * 200,
+                  damage: damage * 0.4,
+                  type: 'shard'
+                });
+              }
+            }
+
+            if (b.type === 'fluff') {
+              const aoeR = 25 * state.stats.area;
+              state.enemies.forEach(e2 => {
+                const d2 = Math.hypot(e2.x - e.x, e2.y - e.y);
+                if (d2 < aoeR && e2 !== e) e2.hp -= damage * 0.5;
+              });
+            }
+
+            // evolve pepper -> gas AoE
+            if (state.pepperEvolved && state.weaponType === 'chicken') {
+              // (เอาแบบเบา ๆ) ข้ามไป
+            }
+
+            e.hp -= damage;
+            e.hitFlash = 0.1;
+            if (e.isBoss) updateBossUi();
+
+            e.hitFlash = 0.09;
+
+            if (e.isBoss) updateBossUi();
+
+            state.damageTexts.push({
+              x: e.x + (Math.random()-0.5)*10, 
+              y: e.y - e.radius - 10,
+              value: Math.round(damage),
+              life: 0, maxLife: 0.6,
+              color: isCritical ? '#facc15' : '#fff' // คริสีเหลือง ปกติสีขาว
+            });
+
+            if (b.pierce && b.pierce > 0) {
+              b.pierce--; // ลดจำนวนเจาะ
+              // กระสุนไม่หายไป แต่ลดดาเมจลงนิดหน่อยเพื่อให้สมดุล
+              b.damage *= 0.9; 
+            } else {
+              state.bullets.splice(j, 1); // ถ้าเจาะหมดแล้วค่อยลบ
+            }
+
+            state.bullets.splice(j, 1);
+            if (e.hp <= 0) {
+              createDeathEffect(e);
+              dropFromEnemy(e);
+              state.kills++;
+              killsLabel.textContent = state.kills;
+              const dieX = e.x;
+              const dieY = e.y;
+              state.enemies.splice(i, 1);
+              if (e.isBoss) { 
+                  updateBossUi(); 
+                  // ตอนนี้ dieX, dieY มีค่าแล้ว ส่งไปได้เลย
+                  handleBossDeath(dieX, dieY); 
+              }
+              break; // มอนตายแล้ว ออกจาก loop bullet นี้
+            }
+
+            if (b.pierce >= 0) break;
+            
+          }
+        }
+
+        // enemy collide player
+        const dp = Math.hypot(e.x - state.player.x, e.y - state.player.y);
+        if (dp < e.radius + state.player.radius) {
+          let dmg = 10;
+          if (e.type === 'chicken') dmg = 15;
+          if (e.isBoss) dmg = 25;
+          if (e.type === 'roach') dmg = 5;
+
+          const bootsLv = state.skills['boots'] || 0;
+          if (bootsLv > 0) dmg *= (1 - 0.1 * bootsLv);
+
+          state.player.hp -= dmg;
+          updateHpUi();
+          if (!e.isBoss) {
+            state.enemies.splice(i, 1);
+          }
+
+          // ไก่ย่างวิ่งได้: ขโมยบัฟความเร็วชั่วคราว -> ลด speed เราเบา ๆ
+          if (e.type === 'chicken') {
+            state.player.speed *= 0.9;
+          }
+
+          if (state.player.hp <= 0) {
+            state.player.hp = 0;
+            updateHpUi();
+            state.running = false;
+            showGameOver();
+            return;
+          }
+        }
+      }
+
+      // mathBoss projectile hit player
+      for (let i = state.bullets.length - 1; i >= 0; i--) {
+        const b = state.bullets[i];
+        if (b.type !== 'mathBoss') continue;
+        const d = Math.hypot(b.x - state.player.x, b.y - state.player.y);
+        if (d < state.player.radius + b.radius) {
+          state.player.hp -= b.damage;
+          state.bullets.splice(i, 1);
+          updateHpUi();
+          if (state.player.hp <= 0) {
+            state.running = false;
+            showGameOver();
+            return;
+          }
+        }
+      }
+
+      // fan (ลมเย็น) / blade damage over time
+      const bladeLv = state.skills['blade'] || 0;
+      if (bladeLv > 0) {
+        const radius = (50 + bladeLv * 12) * state.stats.area; // กว้างขึ้น
+        // หมุนเร็วขึ้นตามเลเวล
+        state.spinBladeAngle += dt * (3 + bladeLv); 
+        
+        const px = state.player.x + Math.cos(state.spinBladeAngle) * radius;
+        const py = state.player.y + Math.sin(state.spinBladeAngle) * radius;
+        const bladeR = 15 + bladeLv * 3; // ใบมีดใหญ่ขึ้น
+
+        // วาดเอฟเฟกต์กงจักร (แบบง่ายๆ ใส่ใน damage logic ไปเลย)
+        // (ปกติวาดใน draw() แต่อันนี้คำนวณชน)
+        
+        state.enemies.forEach(e => {
+          const d = Math.hypot(e.x - px, e.y - py);
+          if (d < bladeR + e.radius) {
+            // ดาเมจแรงมาก (DPS)
+            e.hp -= (30 + bladeLv * 15) * state.stats.might * dt;
+            e.hitFlash = 0.05;
+            // ผลักนิดนึง
+            e.x += (e.x - state.player.x) * 2 * dt;
+            e.y += (e.y - state.player.y) * 2 * dt;
+          }
+        });
+      }
+
+      const fanLv = state.skills['fan'] || 0;
+      if (fanLv > 0) {
+        const fanR = (70 + fanLv * 15) * state.stats.area;
+        state.enemies.forEach(e => {
+          const d = Math.hypot(e.x - state.player.x, e.y - state.player.y);
+          if (d < fanR + e.radius) {
+            // สโลว์หนักๆ
+            e.speed *= (1 - (0.3 + fanLv * 0.1) * dt); 
+            // ดาเมจต่อเนื่อง
+            e.hp -= (5 + fanLv * 5) * state.stats.might * dt;
+            
+            // Knockback (ผลักออก) - สำคัญมากสำหรับสายยืน
+            const push = (20 + fanLv * 10) * dt;
+            const angle = Math.atan2(e.y - state.player.y, e.x - state.player.x);
+            e.x += Math.cos(angle) * push;
+            e.y += Math.sin(angle) * push;
+          }
+        });
+      }
+
+      const bootsLv = state.skills['boots'] || 0;
+      if (bootsLv > 0) {
+         // สร้างกับดักไฟทุกๆ ระยะทาง (ข้ามไปก่อน เอาแบบชนแล้วเจ็บง่ายกว่า)
+         state.enemies.forEach(e => {
+            const d = Math.hypot(e.x - state.player.x, e.y - state.player.y);
+            if (d < state.player.radius + e.radius + 10) {
+                e.hp -= (10 + bootsLv * 10) * state.stats.might * dt;
+            }
+         });
+      }
+
+      // passive: แมวส้ม พลังงานแห่งความง่วง (สุ่มหลับตอนเลเวลอัปใน openLevelUp)
+      if (state.passiveEffects.sleepBuffTime > 0) {
+        state.passiveEffects.sleepBuffTime -= dt;
+        if (state.passiveEffects.sleepBuffTime <= 0) {
+          // หมดบัฟ
+          state.baseDamage /= 1.4;
+        }
+      }
+
+
+
+      // === UNIQUE SKILLS UPDATE ===
+      
+      // 1. ลุงป๋อง: เรียกป้อมปืนถังขยะ (Trash Turret)
+      if (CHARACTERS[state.characterId].passive === 'trashTurret') {
+        state.passiveEffects.trashTurretTimer += dt;
+        if (state.passiveEffects.trashTurretTimer > 5) { // ทุก 5 วินาที
+          state.passiveEffects.trashTurretTimer = 0;
+          // สร้างกระสุนขยะวิ่งวนรอบตัว 3 ชิ้น
+          for(let i=0; i<3; i++) {
+             state.bullets.push({
+              x: state.player.x,
+              y: state.player.y,
+              radius: 6,
+              vx: Math.cos(i*2.09) * 150, // ยิงกระจาย 3 ทิศ
+              vy: Math.sin(i*2.09) * 150,
+              damage: state.baseDamage * 1.5,
+              type: 'stick', // ใช้รูปเดิมไปก่อน
+              life: 2 // กระสุนมีเวลาจำกัด
+            });
+          }
+        }
+      }
+
+      // 2. เจ๊หนิง: บ่อน้ำมันเดือด (Boiling Oil)
+      if (CHARACTERS[state.characterId].passive === 'boilingOil') {
+        state.passiveEffects.oilTimer += dt;
+        if (state.passiveEffects.oilTimer > 4) { // ทุก 4 วินาที
+          state.passiveEffects.oilTimer = 0;
+          state.passiveEffects.oilPuddles.push({
+            x: state.player.x,
+            y: state.player.y,
+            radius: 50 * state.stats.area,
+            life: 5, // อยู่ได้ 5 วิ
+            tickTimer: 0
+          });
+        }
+        
+        // อัปเดตบ่อน้ำมัน
+        for (let i = state.passiveEffects.oilPuddles.length - 1; i >= 0; i--) {
+          const puddle = state.passiveEffects.oilPuddles[i];
+          puddle.life -= dt;
+          puddle.tickTimer += dt;
+          
+          if (puddle.tickTimer > 0.5) { // เผาศัตรูทุก 0.5 วิ
+            puddle.tickTimer = 0;
+            state.enemies.forEach(e => {
+              if (Math.hypot(e.x - puddle.x, e.y - puddle.y) < puddle.radius) {
+                e.hp -= state.baseDamage * 0.8;
+                e.hitFlash = 0.1;
+                // สร้าง Effect ควันเล็กๆ (ถ้ามีระบบ particle)
+              }
+            });
+          }
+          if (puddle.life <= 0) state.passiveEffects.oilPuddles.splice(i, 1);
+        }
+      }
+
+      // 3. แมวส้ม: Zoomies (วิ่งชนแหลก)
+      if (CHARACTERS[state.characterId].passive === 'zoomies') {
+        if (!state.passiveEffects.zoomiesActive) {
+          state.passiveEffects.zoomiesTimer += dt;
+          if (state.passiveEffects.zoomiesTimer > 12) { // ทุก 12 วิ
+            state.passiveEffects.zoomiesActive = true;
+            state.passiveEffects.zoomiesDuration = 3; // วิ่งนาน 3 วิ
+            state.player.speed *= 2; // เพิ่มความเร็ว 2 เท่า
+            showDestinyBanner("ZOOMIES!!! แมวบ้าพลังทำงาน!");
+          }
+        } else {
+          state.passiveEffects.zoomiesDuration -= dt;
+          // ชนศัตรูตายทันทีระหว่างวิ่ง
+          state.enemies.forEach(e => {
+             const dist = Math.hypot(e.x - state.player.x, e.y - state.player.y);
+             if (dist < state.player.radius + e.radius + 20) {
+               e.hp -= 999; // ชนทีเดียวตาย
+               createDeathEffect(e); // บึ้ม
+             }
+          });
+          
+          // สร้าง Effect ภาพติดตา (Afterimage) - ทำง่ายๆด้วยการ push particle
+          
+          if (state.passiveEffects.zoomiesDuration <= 0) {
+            state.passiveEffects.zoomiesActive = false;
+            state.passiveEffects.zoomiesTimer = 0;
+            state.player.speed /= 2; // คืนความเร็ว
+          }
+        }
+      }
+
+
+      // Level up
+      while (state.player.xp >= state.player.xpToNext) {
+        state.player.xp -= state.player.xpToNext;
+        state.player.level += 1;
+        state.player.xpToNext = Math.round(state.player.xpToNext * 1.4 + 3);
+        updateXpUi();
+        state.player.maxHp += 3;
+        state.player.hp += 3;
+        updateHpUi();
+
+        if (CHARACTERS[state.characterId].passive === 'sleepBuff') {
+          if (Math.random() < 0.25) {
+            state.passiveEffects.sleepStun = 2;
+            setTimeout(() => {
+              state.baseDamage *= 1.4;
+              state.passiveEffects.sleepBuffTime = 10;
+            }, 2000);
+          }
+        }
+
+        // 🔊 เล่นเสียงเวลาขึ้นเลเวล
+        playSfx('levelup');
+
+        openLevelUp();
+        break;
+      }
+
+
+      drawMiniMap();
+      updateItems(dt);
+      updateEffects(dt);
+      updateDamageTexts(dt);
+
+    }
+
+    // === DRAW ========================================================
+    function drawBackground() {
+      const root = document.getElementById('game-root');
+      const rect = root.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const img = SPRITES.stage[state.stageId];
+
+      if (img && img.complete) {
+        // วาดเต็มจอ ยืดรูปตามจอ (ง่ายสุด)
+        ctx.drawImage(img, 0, 0, w, h);
+      } else {
+        // ถ้ายังไม่มีรูป / ยังโหลดไม่เสร็จ ใช้ background เดิม
+        ctx.fillStyle = '#020617';
+        ctx.fillRect(0, 0, w, h);
+      }
+    }
+
+
+    function drawPlayer() {
+      const p = state.player;
+      const img = SPRITES.player[state.characterId];
+
+      const size = 64; // ← ตัวใหญ่ขึ้น
+
+      // ออร่ากลมรอบตัว
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, size / 2.1, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(56,189,248,0.18)';
+      ctx.fill();
+      ctx.restore();
+
+      if (img && img.complete) {
+        ctx.save();
+        ctx.drawImage(img, p.x - size / 2, p.y - size / 2, size, size);
+        // ขอบสีขาวบาง ๆ
+        ctx.strokeStyle = 'rgba(248,250,252,0.85)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, size / 2.1, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      } else {
+        // fallback ถ้ารูปยังไม่โหลด
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, size / 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#22d3ee';
+        ctx.fill();
+        ctx.strokeStyle = '#e5e7eb';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+
+
+    function drawAuxSkills() {
+      // ★ เพิ่มบรรทัดนี้: ถ้ายังไม่เลือกตัวละคร หรือเกมยังไม่เริ่ม ให้หยุดทำงานทันที
+      if (!state.characterId || !state.running) return;
+
+      const bladeLv = state.skills['blade'] || 0;
+      if (bladeLv > 0) {
+        const radius = (45 + bladeLv * 8) * state.stats.area;
+        const px = state.player.x + Math.cos(state.spinBladeAngle) * radius;
+        const py = state.player.y + Math.sin(state.spinBladeAngle) * radius;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(px, py, 12 + bladeLv * 2, 0, Math.PI * 2);
+        ctx.fillStyle = '#fb7185';
+        ctx.fill();
+        ctx.restore();
+      }
+
+      const fanLv = state.skills['fan'] || 0;
+      if (fanLv > 0) {
+        const fanR = 60 * state.stats.area + fanLv * 10;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(state.player.x, state.player.y, fanR, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(129,140,248,0.3)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // วาดบ่อน้ำมันเจ๊หนิง (ต้องเช็ก CHARACTERS ก่อนเสมอ)
+      if (CHARACTERS[state.characterId] && CHARACTERS[state.characterId].passive === 'boilingOil') {
+        state.passiveEffects.oilPuddles.forEach(p => {
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(251, 191, 36, 0.4)';
+          ctx.fill();
+          ctx.strokeStyle = '#f59e0b';
+          ctx.lineWidth = 2;
+          ctx.setLineDash([5, 5]);
+          ctx.stroke();
+          ctx.restore();
+        });
+      }
+
+      // เอฟเฟกต์แมวส้ม Zoomies
+      if (state.passiveEffects.zoomiesActive) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(state.player.x, state.player.y, state.player.radius + 10, 0, Math.PI*2);
+        ctx.strokeStyle = `rgba(255, 0, 0, ${Math.random()})`;
+        ctx.lineWidth = 4;
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    function drawBullets() {
+      state.bullets.forEach(b => {
+        ctx.save();
+        if (b.type === 'stick') ctx.fillStyle = '#e5e7eb';
+        else if (b.type === 'chicken') ctx.fillStyle = '#fed7aa';
+        else if (b.type === 'fluff') ctx.fillStyle = '#f9a8d4';
+        else if (b.type === 'burst') ctx.fillStyle = '#a5b4fc';
+        else if (b.type === 'mathBoss') ctx.fillStyle = '#f97316';
+        else ctx.fillStyle = '#e5e7eb';
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        if (b.type === 'mathBoss') {
+          ctx.save();
+          ctx.fillStyle = '#f9a8d4';
+          ctx.font = '9px monospace';
+          ctx.fillText('x²+3?', b.x - 10, b.y - 8);
+          ctx.restore();
+        }
+      });
+    }
+
+    function drawEnemies() {
+      state.enemies.forEach(e => {
+        let spriteKey = e.type;
+        if (e.isBoss && e.type === 'mathBoss') {
+          spriteKey = 'mathBoss';
+        }
+
+        const img = SPRITES.monster[spriteKey];
+
+        if (img && img.complete) {
+          const size = e.isBoss ? 72 : 40;
+          ctx.save();
+          ctx.drawImage(img, e.x - size / 2, e.y - size / 2, size, size);
+          ctx.restore();
+        } else {
+          let color = '#f87171';
+          if (e.type === 'slime') color = '#fb7185';
+          else if (e.type === 'roach') color = '#a3a3a3';
+          else if (e.type === 'chicken') color = '#fbbf24';
+          else if (e.type === 'duck') color = '#60a5fa';
+          else if (e.type === 'ghost') color = '#e5e7eb';
+          else if (e.isBoss && e.type === 'mathBoss') color = '#38bdf8';
+          else if (e.isBoss) color = '#f97316';
+          else if (e.type === 'ratKing') color = '#57534e'; // สีเทาเข้ม
+          else if (e.type === 'butcherPig') color = '#be123c'; // สีแดงเลือดหมู
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(15,23,42,0.8)';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // ★ flash ขาวทับตัวมอน
+        if (e.hitFlash > 0) {
+          const alpha = e.hitFlash / 0.09; // ยิ่งใกล้หมดยิ่งจาง
+          ctx.save();
+          ctx.globalAlpha = alpha;
+          ctx.beginPath();
+          ctx.arc(e.x, e.y, e.radius + (e.isBoss ? 10 : 6), 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
+          ctx.fill();
+          ctx.restore();
+        }
+      });
+    }
+
+
+    function drawMiniMap() {
+      const root = document.getElementById('game-root');
+      const rect = root.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+      const mmRect = minimapEl.getBoundingClientRect();
+      const mmW = mmRect.width;
+      const mmH = mmRect.height;
+
+      minimapEl.innerHTML = '';
+      const mmCanvas = document.createElement('canvas');
+      mmCanvas.width = mmW;
+      mmCanvas.height = mmH;
+      const mmCtx = mmCanvas.getContext('2d');
+
+      mmCtx.fillStyle = 'rgba(15,23,42,1)';
+      mmCtx.fillRect(0, 0, mmW, mmH);
+
+      mmCtx.fillStyle = '#22c55e';
+      const px = (state.player.x / w) * mmW;
+      const py = (state.player.y / h) * mmH;
+      mmCtx.beginPath();
+      mmCtx.arc(px, py, 3, 0, Math.PI * 2);
+      mmCtx.fill();
+
+      const boss = state.enemies.find(e => e.isBoss);
+      if (boss) {
+        mmCtx.fillStyle = '#f97316';
+        const bx = (boss.x / w) * mmW;
+        const by = (boss.y / h) * mmH;
+        mmCtx.beginPath();
+        mmCtx.arc(bx, by, 3, 0, Math.PI * 2);
+        mmCtx.fill();
+      }
+
+      minimapEl.appendChild(mmCanvas);
+    }
+
+    function draw() {
+      drawBackground();
+
+      if (state.portal && state.portal.active) {
+        ctx.save();
+        ctx.translate(state.portal.x, state.portal.y);
+        ctx.rotate(state.portal.timer * 2); // หมุนวิบวับ
+        
+        // วงแหวนรอบนอก
+        ctx.beginPath();
+        ctx.arc(0, 0, state.portal.radius, 0, Math.PI * 2);
+        ctx.strokeStyle = '#a855f7'; // สีม่วง
+        ctx.lineWidth = 4;
+        ctx.setLineDash([10, 5]);
+        ctx.stroke();
+        
+        // วงใน (รูหนอน)
+        ctx.beginPath();
+        ctx.arc(0, 0, state.portal.radius * 0.7, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(168, 85, 247, 0.6)';
+        ctx.fill();
+        
+        // ข้อความ
+        ctx.rotate(-state.portal.timer * 2); // หมุนกลับเพื่อเขียนตัวหนังสือตรงๆ
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 12px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText("EXIT", 0, 4);
+        
+        ctx.restore();
+      }
+
+      drawEffects();   // เอฟตัวแตก / spark
+      drawItems();
+      drawPlayer();
+      drawAuxSkills();
+      drawBullets();
+      drawEnemies();
+      drawDamageTexts();
+    }
+
+
+    // === GAME OVER ===================================================
+    // แก้ในส่วนที่จัดการ Game Over เดิมของมึง
+    function showGameOver() {
+      state.running = false;
+      goTime.textContent = state.time.toFixed(1);
+      goKills.textContent = state.kills.toString();
+      goLevel.textContent = state.player.level.toString();
+      goGold.textContent = Math.round(state.goldRun).toString();
+      screenGameover.classList.remove('hidden');
+
       meta.gold += Math.round(state.goldRun);
       saveMeta();
-      saveScoreOnline();
-      screenGameover.classList.remove('hidden');
+
+      // เรียกใช้ระบบ Leaderboard
+      saveScoreOnline().then(() => {
+          loadLeaderboard();
+      });
+    }
+
+    // === START RUN ===================================================
+    function startRun() {
+      const root = document.getElementById('game-root');
+      const rect = root.getBoundingClientRect();
+
+      const c = CHARACTERS[state.characterId];
+      if (!c) return;
+
+      state.player.x = rect.width / 2;
+      state.player.y = rect.height / 2;
+
+      const hpUpLv = meta.powerups.hpUp || 0;
+      const speedUpLv = meta.powerups.speedUp || 0;
+      const mightUpLv = meta.powerups.mightUp || 0;
+      const luckUpLv = meta.powerups.luckUp || 0;
+
+      state.player.maxHp = c.hp + hpUpLv * 10;
+      state.player.hp = state.player.maxHp;
+      state.player.level = 1;
+      state.player.xp = 0;
+      state.player.xpToNext = 5;
+
+      state.baseDamage = c.baseDamage * (1 + mightUpLv * 0.1);
+      state.player.speed = c.speed + speedUpLv * 8;
+      state.weaponType = c.weaponType;
+
+      state.enemies = [];
+      state.bullets = [];
+      state.items = [];
+      state.skills = {};
+      state.stats = {
+        might: 1 + mightUpLv * 0.1,
+        area: 1,
+        cooldown: 1,
+        luck: 1 + luckUpLv * 0.1,
+        curse: 1
+      };
+      state.spinBladeAngle = 0;
+
+      state.time = 0;
+      state.kills = 0;
+      state.goldRun = 0;
+      state.spawnTimer = 0;
+      state.spawnInterval = 1500;
+      state.shootTimer = 0;
+      state.burstTimer = 0;
+      state.bossSpawned = false;
+      state.destinyTimer = 0;
+      state.destinyActive = null;
+      state.destinyTimeLeft = 0;
+      state.pepperEvolved = false;
+
+      state.passiveEffects.trashTreasure = c.passive === 'trashTreasure';
+      state.passiveEffects.crispyBuff = c.passive === 'crispyBuff';
+      state.passiveEffects.sleepBuff = c.passive === 'sleepBuff';
+      state.passiveEffects.sleepStun = 0;
+      state.passiveEffects.sleepBuffTime = 0;
+
+      state.running = true;
+      state.inLevelUp = false;
+
+      screenMainMenu.classList.add('hidden');
+      screenCharStage.classList.add('hidden');
+      screenLevelup.classList.add('hidden');
+      screenGameover.classList.add('hidden');
+      screenPowerups.classList.add('hidden');
+
+      playBgm();
+
+      updateHpUi();
+      updateXpUi();
+      killsLabel.textContent = '0';
+      goldRunLabel.textContent = '0';
+      updateSkillBar();
+      updateBossUi();
+    }
+
+    // === MAIN MENU BUTTONS ===========================================
+    btnMainStart.addEventListener('click', () => {
+      screenMainMenu.classList.add('hidden');
+      screenCharStage.classList.remove('hidden');
+    });
+
+    btnMainPowerups.addEventListener('click', () => {
+      screenPowerups.classList.remove('hidden');
+      buildPowerupCards();
+    });
+
+    btnClosePowerups.addEventListener('click', () => {
+      screenPowerups.classList.add('hidden');
+    });
+
+    btnStartRun.addEventListener('click', () => {
+      if (!state.characterId || !state.stageId) return;
+      playerSession.startTime = Date.now(); // เพิ่มบรรทัดนี้
+      startRun();
+    });
+
+    btnRestart.addEventListener('click', () => {
+      state.running = false;
+      screenGameover.classList.add('hidden');
+      screenMainMenu.classList.remove('hidden');
+      screenCharStage.classList.add('hidden');
+      
+      // ★ รีเฟรชหน้าเมนูเพื่อให้ปุ่มซื้ออัปเดตตามเงินจริง
+      buildCharacterCards();
+      buildStageCards();
+    });
+
+
+    function handleBossDeath(x, y) {
+        // ล้างบางมอนสเตอร์ที่เหลือ (ฉลองชัยชนะ)
+        state.enemies.forEach(e => {
+            if(!e.isBoss) {
+                createDeathEffect(e);
+                dropFromEnemy(e);
+            }
+        });
+        state.enemies = []; 
+
+        // ★ เสกประตูวาปออกมา
+        state.portal = {
+            x: x,
+            y: y,
+            radius: 45, // ขนาดประตู
+            active: true,
+            timer: 0
+        };
+        
+        showDestinyBanner("✨ ประตูมิติเปิดแล้ว! เข้าไปเพื่อจบด่าน!");
+        playSfx('levelup'); // เสียงแจ้งเตือน
     }
 
     function finishStage() {
-      state.running = false;
-      const next = STAGES[state.stageId].nextStage;
-      if(next && !meta.unlockedStages.includes(next)) {
-        meta.unlockedStages.push(next);
-      }
-      meta.gold += Math.round(state.goldRun);
-      saveMeta();
-      alert("VICTORY! Stage Cleared!");
-      location.reload();
+        state.running = false;
+        
+        // 1. ปลดล็อกด่านถัดไป
+        const currentStage = STAGES[state.stageId];
+        const nextStageId = currentStage.nextStage;
+        let msg = "ภารกิจสำเร็จ! กลับสู่ Lobby";
+
+        if (nextStageId) {
+            if (!meta.unlockedStages.includes(nextStageId)) {
+                meta.unlockedStages.push(nextStageId);
+                msg = "ยินดีด้วย! ปลดล็อกด่าน: " + STAGES[nextStageId].name;
+            }
+        } else {
+            msg = "สุดยอด! คุณเคลียร์เกมครบทุกด่านแล้ว!";
+        }
+        
+        // 2. บันทึกทองและข้อมูล
+        meta.gold += Math.round(state.goldRun);
+        saveMeta();
+        
+        // 3. แจ้งเตือนและดีดกลับหน้า Lobby
+        alert(msg);
+        
+        screenGameover.classList.add('hidden'); 
+        screenMainMenu.classList.remove('hidden');
+        screenCharStage.classList.add('hidden');
+        
+        // 4. รีเฟรชปุ่มต่างๆ
+        buildCharacterCards();
+        buildStageCards();
+        metaGoldLabel.textContent = meta.gold;
+        
+        // 5. ล้างค่าประตู
+        state.portal = null;
     }
 
-    // Buttons
-    document.getElementById('btn-main-start').onclick = () => { screenMainMenu.classList.add('hidden'); screenCharStage.classList.remove('hidden'); };
-    document.getElementById('btn-main-powerups').onclick = () => { buildPowerupCards(); screenPowerups.classList.remove('hidden'); };
-    document.getElementById('btn-close-powerups').onclick = () => screenPowerups.classList.add('hidden');
-    document.getElementById('btn-restart').onclick = () => location.reload();
-    document.getElementById('btn-start-run').onclick = startRun;
+    // === LOOP ========================================================
+    function loop(timestamp) {
+      if (!state.lastTimestamp) state.lastTimestamp = timestamp;
+      const dt = (timestamp - state.lastTimestamp) / 1000;
+      state.lastTimestamp = timestamp;
 
-    // Loop
-    let lastTime = 0;
-    function loop(t) {
-      const dt = (t - lastTime)/1000;
-      lastTime = t;
-      update(Math.min(dt, 0.1));
+      update(dt);
       draw();
+
       requestAnimationFrame(loop);
     }
-    
-    // Init
-    loadAllSprites();
+
+    // init
+    metaGoldLabel.textContent = meta.gold.toString();
+    metaGoldLabel2.textContent = meta.gold.toString();
     buildCharacterCards();
     buildStageCards();
+    updateCharStageSelection();
+    updateSkillBar();
+    updateBossUi();
+
+    loadAllSprites(); // โหลดรูป
+    loadSounds();     // โหลดเสียง  <<< เพิ่มบรรทัดนี้
+
     requestAnimationFrame(loop);
+
 
   </script>
 </body>
